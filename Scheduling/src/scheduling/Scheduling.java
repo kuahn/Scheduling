@@ -13,5 +13,11 @@ public class Scheduling {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        Subject math = Subject.createSubject("Math", new String[] {"Algebra", "Geometry (dash)"}, new int[] {2, 4});
+        for (Klass k : math.klasses) {
+            for (Section s : k.sections) {
+                System.out.println(s);
+            }
+        }
     }
 }

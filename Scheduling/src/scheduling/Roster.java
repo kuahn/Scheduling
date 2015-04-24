@@ -40,7 +40,7 @@ public class Roster {
     }
     public Section getSection(Klass klass, Student student) {//In a certian klass, what section is this student in?
         for (Section section : taking.get(student)) {
-            if (section.klass.equals(klass)) {
+            if (section.isIn(klass)) {
                 return section;
             }
         }
@@ -48,10 +48,13 @@ public class Roster {
     }
     public ArrayList<Section> getSections(Subject subject, Student student) {//same, but a student can be in multiple sections of the same subject
         ArrayList<Section> result = new ArrayList<>();
-        taking.get(student).stream().parallel().filter((currentlyTaking)->(currentlyTaking.klass.subject.equals(subject))).forEach((currentlyTaking)->{
+        taking.get(student).stream().parallel().filter((currentlyTaking)->(currentlyTaking.isIn(subject))).forEach((currentlyTaking)->{
             result.add(currentlyTaking);
         });
         return result;
+    }
+    public ArrayList<Section> getSections(Student student) {
+        return taking.get(student);
     }
     public static Section findConflict(Section section, ArrayList<Section> currentlyTaking) {
         for (Section previous : currentlyTaking) {

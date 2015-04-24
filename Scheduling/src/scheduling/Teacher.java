@@ -7,36 +7,28 @@ import java.util.ArrayList;
  */
 public class Teacher {
     final String name;
-    final HashMap<Block, Boolean> workingTimes;
-    public Teacher(String name, HashMap<Block, Boolean> workingTimes) {
-        this.name = name;
-        this.workingTimes = workingTimes;
-    }
+    private final boolean[] workingBlocks = new boolean[Block.numBlocks];
+    ArrayList<Subject> subjectsTeached;
+    ArrayList<Klass> klassesTeached;
     public Teacher(String name) {
-        this(name, worksAlways());
+        this.name = name;
     }
-    public Teacher(String name, ArrayList<Block> works) {
-        this(name, fromBlocks(works));
-    }
-    public static HashMap<Block, Boolean> worksAlways() {
-        HashMap<Block, Boolean> result = new HashMap<>();
-        for (Block b : Block.blocks) {
-            result.put(b, true);
+    public Teacher(String name, ArrayList<Block> doesNotWork) {
+        this(name);
+        for (Block notWork : doesNotWork) {
+            setDoesWork(notWork, false);
         }
-        return result;
     }
-    public static HashMap<Block, Boolean> fromBlocks(ArrayList<Block> blocks) {
-        HashMap<Block, Boolean> result = new HashMap<>();
-        for (Block b : blocks) {
-            result.put(b, true);
-        }
-        return result;
+    public final boolean worksDuringBlock(Block b) {
+        return workingBlocks[b.blockID];
     }
-    public boolean worksDuringBlock(Block b) {
-        Boolean w = workingTimes.get(b);
-        if (w == null) {
-            return false;
-        }
-        return w;
+    public final boolean worksDuringBlock(int id) {
+        return workingBlocks[id];
+    }
+    public final void setDoesWork(Block b, boolean doesWork) {
+        workingBlocks[b.blockID] = doesWork;
+    }
+    public final void setDoesWork(int id, boolean doesWork) {
+        workingBlocks[id] = doesWork;
     }
 }

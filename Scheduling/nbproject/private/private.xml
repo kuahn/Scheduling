@@ -3,16 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Scheduling.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Schedule.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Block.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Room.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Klass.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Section.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Subject.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Teacher.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Student.java</file>
-            <file>file:/Users/leijurv/Dropbox/Java-Projects/Scheduling/src/scheduling/Grade.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Teacher.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Roster.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Scheduling.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Block.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Subject.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Schedule.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Klass.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Section.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Student.java</file>
+            <file>file:/Users/leijurv/Dropbox/Scheduling/Scheduling/src/scheduling/Grade.java</file>
         </group>
     </open-files>
 </project-private>

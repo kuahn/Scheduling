@@ -4,7 +4,18 @@ package scheduling;
  * @author leijurv
  */
 public class Section {
-    Klass klass;
+    final Klass klass;
+    final int sectionID;
+    public Section(Klass klass, int sectionID) {
+        this.klass = klass;
+        this.sectionID = sectionID;
+    }
+    public boolean isIn(Klass klass) {
+        return klass.equals(this.klass);
+    }
+    public boolean isIn(Subject subject) {
+        return klass.getSubject().equals(subject);
+    }
     public boolean conflictsWith(Section other) {
         if (equals(other)) {
             return true;//don't want to be in the same thing twice
@@ -14,5 +25,9 @@ public class Section {
         }
         //a student CAN theoretically take two sections of the same subject
         return false;
+    }
+    public final char[] alphabet = {'A', 'B', 'C', 'D', 'E', 'F', 'G'};
+    public String toString() {
+        return klass + " Section " + alphabet[sectionID];
     }
 }
