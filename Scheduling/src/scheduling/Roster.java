@@ -48,7 +48,7 @@ public class Roster {
     }
     public ArrayList<Section> getSections(Subject subject, Student student) {//same, but a student can be in multiple sections of the same subject
         ArrayList<Section> result = new ArrayList<>();
-        taking.get(student).stream().filter((currentlyTaking)->(currentlyTaking.klass.subject.equals(subject))).forEach((currentlyTaking)->{
+        taking.get(student).stream().parallel().filter((currentlyTaking)->(currentlyTaking.klass.subject.equals(subject))).forEach((currentlyTaking)->{
             result.add(currentlyTaking);
         });
         return result;
