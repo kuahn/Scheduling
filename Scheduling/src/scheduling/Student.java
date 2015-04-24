@@ -7,11 +7,15 @@ import java.util.HashMap;
  */
 public class Student {
     static HashMap<Grade, ArrayList<Subject>> requiredSubjects;
-    ArrayList<Klass> requiredClasses;
+    final ArrayList<Klass> requiredClasses;
     final String name;
     final Grade grade;
-    public Student(String name, Grade grade) {
+    public Student(String name, Grade grade, ArrayList<Klass> requiredClasses) {
         this.name = name;
         this.grade = grade;
+        this.requiredClasses = requiredClasses;
+    }
+    public Student(String name, Grade grade) {
+        this(name, grade, new ArrayList<>());
     }
 }
