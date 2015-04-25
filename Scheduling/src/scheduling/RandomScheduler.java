@@ -24,25 +24,32 @@ public class RandomScheduler extends Scheduler {
         System.out.println("Teachers: " + temp.teachers);
         Map<Teacher, String> teacherSchedules = teachers.stream().collect(Collectors.toMap(teacher->teacher, teacher->temp.printSchedule(teacher)));
         System.out.println("Schedules for teachers: " + teacherSchedules);
-        Stream<Student> unassignable = students.stream().filter(student->!assignStudent(student));
+        Stream<Student> unassignable = students.stream().filter(student->assignStudent(student) > 0);
         List<Student> unassignableStudents = unassignable.collect(Collectors.toList());
         System.out.println("Unassignable students: " + unassignableStudents);
     }
-    public boolean assignStudent(Student student) {
+    public int assignStudent(Student student) {
         Random r = new Random();
-        ArrayList<ArrayList<Section>> requirements = student.getRequirements();
-        for (ArrayList<Section> klass : requirements) {
+        Stream<Requirement> requirements = student.getRequirementStream(temp.roster);
+        List<Section> unfufilled = requirements.map(requirement->{
             //The combination of parallel, filter, and findany makes this effectively a random selection, I think
-            Optional<Section> toJoin = klass.stream().parallel().filter(section->canJoinClass(student, section)).findAny();
+            Optional<Section> toJoin = requirement.getSectionOptionStream().parallel().filter(section->canJoinClass(student, section)).findAny();
             if (!toJoin.isPresent()) {
-                System.out.println("Unable to fufill requirement " + klass + " for student " + student);
-                return false;
+                System.out.println("Unable to fufill requirement " + requirement + " for student " + student);
+                return null;
             }
             Section section = toJoin.get();
-            System.out.println("Adding " + student + " to " + section + " to fufill requirement " + klass);
-            temp.roster.setSection(student, section);
-        }
-        return true;
+            System.out.println("Adding " + student + " to " + section + " to fufill requirement " + requirement);
+            return section;
+        }).collect(Collectors.toList());//converting to list then back to stream because original was stream and there is a possibility for concurrentmodificationexception
+        return unfufilled.stream().mapToInt(section->{
+            if (section != null) {
+                temp.roster.setSection(student, section);//moved this down here
+                return 0;
+            } else {
+                return 1;
+            }
+        }).sum();
     }
     public boolean canJoinClass(Student student, Section section) {
         Block sectionTime = temp.timings.get(section);

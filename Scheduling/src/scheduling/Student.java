@@ -1,9 +1,7 @@
 package scheduling;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Arrays;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 /**
@@ -11,9 +9,8 @@ import java.util.stream.Stream;
  * @author leijurv
  */
 public class Student {
-    private static final HashMap<Grade, ArrayList<Subject>> allRequiredSubjects;
-    final ArrayList<Klass> requiredClasses;
-    final ArrayList<Subject> requiredSubjects;
+    private static final HashMap<Grade, ArrayList<SubjectRequirement>> allRequiredSubjects;
+    final ArrayList<Requirement> requirements;
     final String name;
     final Grade grade;
     static{
@@ -23,18 +20,17 @@ public class Student {
         }
     }
     public static void addRequiredSubject(Grade grade, Subject subject) {
-        allRequiredSubjects.get(grade).add(subject);
+        allRequiredSubjects.get(grade).add(new SubjectRequirement(subject, grade + " " + subject + " requirement"));
     }
     public static void addRequiredSubject(Subject subject, Grade grade) {//in case you get the argument order wrong =)
-        allRequiredSubjects.get(grade).add(subject);
+        addRequiredSubject(grade, subject);
     }
     public Student(String name, Grade grade, ArrayList<Klass> requiredClasses) {
         this.name = name;
         this.grade = grade;
-        this.requiredClasses = requiredClasses;
-        this.requiredSubjects = new ArrayList<>(allRequiredSubjects.get(grade));
+        requirements = new ArrayList<>(allRequiredSubjects.get(grade));
         for (Klass klass : requiredClasses) {//if the student is required to take Algebra II, remove the redundant requirement to take one math class
-            requiredSubjects.remove(klass.getSubject());
+            requirements.remove(klass.getSubject());
         }
     }
     public Student(String name, Grade grade, Klass[] requiredClasses) {//to make it easier if you want to pass an array not arraylist
@@ -43,32 +39,37 @@ public class Student {
     public Student(String name, Grade grade) {
         this(name, grade, new ArrayList<>());
     }
-    public static ArrayList<ArrayList<Section>> unfufilledRequirements(Student student, Roster roster) {//TODO: check if it would be faster to return a List<Klass> in terms of how this function is called
-        Stream<Subject> reqSubjects = student.requiredSubjects.stream();//stream of required subjects
-        Stream<Klass> reqKlasses = student.requiredClasses.stream();//stream of required klasses
-        reqSubjects = reqSubjects.parallel();//make it parallel to make the filter operation faster
-        reqKlasses = reqKlasses.parallel();//this is safe becasue Section.isIn is thread safe
+    public static ArrayList<Requirement> unfufilledRequirements(Student student, Roster roster) {
+        return new ArrayList<>(unfufilledRequirementsStream(student, roster).collect(Collectors.toList()));
+    }
+    public static Stream<Requirement> unfufilledRequirementsStream(Student student, Roster roster) {
+        Stream<Requirement> reqs = student.requirements.stream();
+        reqs = reqs.parallel();//make it parallel to make the filter operation faster
         // TODO check if parallel makes it faster
         if (roster != null) {
             ArrayList<Section> currentSections = roster.getSections(student);
             for (Section taking : currentSections) {
-                reqSubjects = reqSubjects.filter(sub->!taking.isIn(sub));//filter out subjects that have just been met
-                reqKlasses = reqKlasses.filter(klass->!taking.isIn(klass));
+                reqs = reqs.filter(req->!req.fufilledBy(taking));//filter out subjects that have just been met
             }
         }
         //now all the items in both streams are klasses and subjects that are not satisfied by currentSections
-        ArrayList<ArrayList<Section>> result = new ArrayList<>(reqKlasses.map(klass->new ArrayList<>(Arrays.asList(klass.sections))).collect(Collectors.toList()));
-        //replace each klass with a list of its sections
-        List<ArrayList<Section>> fromSub = reqSubjects.map(subject->new ArrayList<>(subject.klasses.stream().parallel().map(klass->Arrays.asList(klass.sections)).flatMap(x->x.stream()).collect(Collectors.toList()))).collect(Collectors.toList());//don't convert outer to arraylist because we are adding to other
-        //^^ AVE GLORIOSA EN NOMINE STREAMS ^^
+        return reqs;
+//^^ AVE GLORIOSA EN NOMINE STREAMS ^^
         //WE PRAISE OUR GLORIOUS LORD STREAM
         //MAY HE GRANT US PARALELL PROCESSING AND REDUCING
         //ALL HAIL STREAMS
-        result.addAll(fromSub);
-        return result;
     }
-    public ArrayList<ArrayList<Section>> getRequirements() {
+    public ArrayList<Requirement> getRequirements() {
         return unfufilledRequirements(this, null);
+    }
+    public Stream<Requirement> getRequirementStream() {
+        return unfufilledRequirementsStream(this, null);
+    }
+    public ArrayList<Requirement> getRequirements(Roster r) {
+        return unfufilledRequirements(this, r);
+    }
+    public Stream<Requirement> getRequirementStream(Roster r) {
+        return unfufilledRequirementsStream(this, r);
     }
     /*
      private ArrayList<ArrayList<Section>> calculateRequirements() {
