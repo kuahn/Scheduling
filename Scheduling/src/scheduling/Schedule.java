@@ -9,11 +9,20 @@ import java.util.stream.Stream;
  * @author leijurv
  */
 public class Schedule {
-    HashMap<Section, Room> locations;
-    HashMap<Section, Block> timings;
-    HashMap<Section, Teacher> teachers;
-    ArrayList<Section> sections;
-    Roster roster;
+    final HashMap<Section, Room> locations;
+    final HashMap<Section, Block> timings;
+    final HashMap<Section, Teacher> teachers;
+    final ArrayList<Section> sections;
+    final ArrayList<Student> students;
+    final Roster roster;
+    public Schedule(ArrayList<Section> sections, ArrayList<Student> students) {
+        locations = new HashMap<>();
+        timings = new HashMap<>();
+        teachers = new HashMap<>();
+        this.sections = sections;
+        this.students = students;
+        this.roster = new Roster(students, sections);
+    }
     public void findConflicts() {
     }
     public List<Section> getTeacherLocation(Teacher teacher, Block time) {//well, the teacher SHOULD only be in one place...

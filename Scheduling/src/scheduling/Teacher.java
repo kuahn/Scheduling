@@ -15,9 +15,9 @@ public class Teacher {
     }
     public Teacher(String name, ArrayList<Block> doesNotWork) {
         this(name);
-        for (Block notWork : doesNotWork) {
+        doesNotWork.stream().parallel().forEach((notWork)->{
             setDoesWork(notWork, false);
-        }
+        });
     }
     public final boolean worksDuringBlock(Block b) {
         return workingBlocks[b.blockID];

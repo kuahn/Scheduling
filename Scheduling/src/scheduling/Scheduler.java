@@ -1,5 +1,6 @@
 package scheduling;
 import java.util.ArrayList;
+import java.util.Arrays;
 /**
  *
  * @author leijurv
@@ -21,7 +22,7 @@ public abstract class Scheduler {
         });
         sections = new ArrayList<>();
         klasses.stream().forEach(klass->{
-            sections.addAll(klass.sections);
+            sections.addAll(Arrays.asList(klass.sections));
         });
     }
     public abstract void startScheduling();

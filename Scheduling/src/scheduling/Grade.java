@@ -3,12 +3,10 @@ package scheduling;
  *
  * @author leijurv
  */
-public class Grade {
+public enum Grade {//enum is better because it deals with hashCode and equals on its own
+    GRADE9(9), GRADE10(10), GRADE11(11), GRADE12(12);
     final int grade;
-    public Grade(int grade) {
+    private Grade(int grade) {
         this.grade = grade;
-    }
-    public int hashCode() {
-        return grade * 8723;
     }
 }

@@ -1,6 +1,7 @@
 package scheduling;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 /**
  *
@@ -47,8 +48,8 @@ public class Roster {
         }
         return null;
     }
-    public ArrayList<Section> getSections(Subject subject, Student student) {//same, but a student can be in multiple sections of the same subject
-        return new ArrayList<>(taking.get(student).stream().parallel().filter((currentlyTaking)->(currentlyTaking.isIn(subject))).collect(Collectors.toList()));
+    public List<Section> getSections(Subject subject, Student student) {//same, but a student can be in multiple sections of the same subject
+        return taking.get(student).stream().parallel().filter((currentlyTaking)->(currentlyTaking.isIn(subject))).collect(Collectors.toList());
     }
     public ArrayList<Section> getSections(Student student) {
         return taking.get(student);

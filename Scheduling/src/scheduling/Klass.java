@@ -1,5 +1,4 @@
 package scheduling;
-import java.util.ArrayList;
 /**
  *
  * @author leijurv
@@ -8,13 +7,13 @@ public class Klass {
     private Subject subject = null;
     final String name;
     final int numSections;
-    final ArrayList<Section> sections;
+    final Section[] sections;
     public Klass(String name, int numSections) {
         this.name = name;
         this.numSections = numSections;
-        sections = new ArrayList<>(numSections);//ensure capacity
+        sections = new Section[numSections];//ensure capacity
         for (int i = 0; i < numSections; i++) {
-            sections.add(new Section(this, i));
+            sections[i] = new Section(this, i);
         }
     }
     public void registerSubject(Subject s) {

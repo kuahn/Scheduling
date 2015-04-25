@@ -17,7 +17,19 @@ public class Block {
         this.blockID = blockID;
         this.meetingsPerWeek = meetingsPerWeek;
     }
+    @Override
     public int hashCode() {
         return blockID;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Block other = (Block) obj;
+        return this.blockID == other.blockID;
     }
 }
