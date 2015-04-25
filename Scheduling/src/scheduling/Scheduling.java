@@ -4,9 +4,6 @@
  * and open the template in the editor.
  */
 package scheduling;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 /**
@@ -68,9 +65,6 @@ public class Scheduling {
         double numAt = 0;
         double numU = 0;
         int numStud = students.size();
-        BigInteger ntF = factorial(students.size());
-        ArrayList<Integer> sofar = new ArrayList<>();
-        ArrayList<BigDecimal> bd = new ArrayList<>();
         while (true) {
             try {
                 rd.startScheduling();
@@ -84,14 +78,6 @@ public class Scheduling {
                         //System.out.println("did");
                         numU += numUn;
                         numAt++;
-                        int ii = students.size() - numUn;
-                        sofar.add(ii);
-                        BigDecimal qq = quotient(ii, numStud, ntF);
-                        bd.add(qq);
-                        for (int chance = 1; chance < 999; chance++) {
-                            double c = ((double) chance) / 1000D;
-                            chanceArray[chance] += binomialDist(ii, numStud, c, qq);
-                        }
                     } catch (NumberFormatException ee) {
                         System.out.println(ee);
                         System.out.println(e);
@@ -99,61 +85,12 @@ public class Scheduling {
                     }
                     System.out.println("Calc took " + (System.currentTimeMillis() - time));
                 }
-                System.out.println(x + "," + numU + "," + numAt);
+                //System.out.println(x + "," + numU + "," + numAt);
                 System.out.println(Math.floor(numU / (numAt) * 100) / 100 + " of " + students.size() + ", or " + toPercent(numU / (numAt * students.size())) + " of students, are unplacable on average over " + numAt + " attempts");
-                double p = calculate(sofar, bd, students.size());
-                System.out.println("This suggests that each student has a probability of " + toPercent(p));
-                double xx = binomialDist(numStud, numStud, p, quotient(numStud, numStud, ntF));
-                System.out.println("Therefore, the probability of getting all of them is " + toPercent(xx));
-                double r = Math.log(0.5) / Math.log(1 - xx);
-                System.out.println("Should take " + r + " attempts on average");
             }
         }
     }
-    static double[] chanceArray = new double[1000];
     public static String toPercent(double v) {
         return Math.floor(v * 10000) / 100 + "%";
-    }
-    /*
-     public static void main(String[] args) {
-     ArrayList<Integer> dank = new ArrayList<>();
-     dank.add(110);
-     dank.add(12);
-     dank.add(21);
-     dank.add(9);
-     calculate(dank, 200);
-     }*/
-    public static double calculate(ArrayList<Integer> trials, ArrayList<BigDecimal> quotient, int numTrials) {
-        double maxV = 0;
-        double maxC = 0;
-        for (int c = 1; c < 99; c++) {
-            double chance = ((double) c) / 1000D;
-            double tot = chanceArray[c];
-            if (tot > maxV) {
-                maxV = tot;
-                maxC = chance;
-            }
-        }
-        //System.out.println(maxV);
-        //System.out.println(maxC);
-        return maxC;
-    }
-    public static BigDecimal quotient(int numCorrect, int numTrials, BigInteger ntF) {
-        BigInteger denom = factorial(numCorrect).multiply(factorial(numTrials - numCorrect));
-        BigDecimal ntFBD = new BigDecimal(ntF);
-        BigDecimal denomBD = new BigDecimal(denom);
-        BigDecimal quotient = ntFBD.divide(denomBD, 40, RoundingMode.HALF_UP);
-        return quotient;
-    }
-    public static double binomialDist(int numCorrect, int numTrials, double probValue, BigDecimal quotient) {
-        BigDecimal restBD = BigDecimal.valueOf(Math.pow(probValue, numCorrect) * Math.pow((1d - probValue), numTrials - numCorrect));
-        return (quotient.multiply(restBD).doubleValue());
-    }
-    public static BigInteger factorial(int n) {
-        BigInteger res = BigInteger.ONE;
-        for (int i = n; i > 1; i--) {
-            res = res.multiply(BigInteger.valueOf(i));
-        }
-        return (res);
     }
 }
