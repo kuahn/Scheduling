@@ -1,4 +1,5 @@
 package scheduling;
+import java.util.ArrayList;
 /**
  *
  * @author leijurv
@@ -27,7 +28,11 @@ public class Section {
         return false;
     }
     public final char[] alphabet = {'A', 'B', 'C', 'D', 'E', 'F', 'G'};
+    @Override
     public String toString() {
         return klass + " Section " + alphabet[sectionID];
+    }
+    public ArrayList<Teacher> getTeachers() {
+        return klass.getTeachers();
     }
 }

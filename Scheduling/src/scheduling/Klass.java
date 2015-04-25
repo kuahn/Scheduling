@@ -1,4 +1,6 @@
 package scheduling;
+import java.util.ArrayList;
+import java.util.Arrays;
 /**
  *
  * @author leijurv
@@ -8,13 +10,18 @@ public class Klass {
     final String name;
     final int numSections;
     final Section[] sections;
-    public Klass(String name, int numSections) {
+    final ArrayList<Teacher> teachers;
+    public Klass(String name, int numSections, Teacher[] customTeachers) {
         this.name = name;
         this.numSections = numSections;
-        sections = new Section[numSections];//ensure capacity
+        sections = new Section[numSections];
         for (int i = 0; i < numSections; i++) {
             sections[i] = new Section(this, i);
         }
+        teachers = new ArrayList<>(Arrays.asList(customTeachers));
+    }
+    public Klass(String name, int numSections) {
+        this(name, numSections, new Teacher[] {});
     }
     public void registerSubject(Subject s) {
         if (subject != null) {
@@ -23,12 +30,17 @@ public class Klass {
         if (!s.hasKlass(this)) {
             throw new IllegalStateException("YOU ARE NOT MY REAL SUBJECT");
         }
+        teachers.addAll(s.teachers);
         subject = s;
     }
     public Subject getSubject() {
         return subject;
     }
+    @Override
     public String toString() {
         return subject + "--" + name;
+    }
+    public ArrayList<Teacher> getTeachers() {
+        return teachers;
     }
 }

@@ -1,5 +1,6 @@
 package scheduling;
 import java.util.ArrayList;
+import java.util.Arrays;
 /**
  *
  * @author leijurv
@@ -7,12 +8,15 @@ import java.util.ArrayList;
 public class Subject {
     final String name;
     final ArrayList<Klass> klasses;
-    public Subject(String name, ArrayList<Klass> klasses) {
+    final ArrayList<Teacher> teachers;
+    public Subject(String name, ArrayList<Klass> klasses, Teacher[] teachers) {
+        this.teachers = new ArrayList<>(Arrays.asList(teachers));
         this.klasses = klasses;
         this.name = name;
         registerKlasses();
     }
-    public Subject(String name, String[] klassNames, int[] sectionNumbers) {
+    public Subject(String name, String[] klassNames, int[] sectionNumbers, Teacher[] teachers) {
+        this.teachers = new ArrayList<>(Arrays.asList(teachers));
         if (klassNames.length != sectionNumbers.length) {
             throw new IllegalArgumentException("Different numbers of klassNames and sectionNumbers");
         }

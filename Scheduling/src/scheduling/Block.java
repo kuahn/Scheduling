@@ -32,4 +32,8 @@ public class Block {
         final Block other = (Block) obj;
         return this.blockID == other.blockID;
     }
+    @Override
+    public String toString() {
+        return "Block " + blockID;
+    }
 }
