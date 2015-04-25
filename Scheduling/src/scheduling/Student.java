@@ -60,7 +60,10 @@ public class Student {
         ArrayList<ArrayList<Section>> result = new ArrayList<>(reqKlasses.map(klass->new ArrayList<>(Arrays.asList(klass.sections))).collect(Collectors.toList()));
         //replace each klass with a list of its sections
         List<ArrayList<Section>> fromSub = reqSubjects.map(subject->new ArrayList<>(subject.klasses.stream().parallel().map(klass->Arrays.asList(klass.sections)).flatMap(x->x.stream()).collect(Collectors.toList()))).collect(Collectors.toList());//don't convert outer to arraylist because we are adding to other
-        //do the same with subjects
+        //^^ AVE GLORIOSA EN NOMINE STREAMS ^^
+        //WE PRAISE OUR GLORIOUS LORD STREAM
+        //MAY HE GRANT US PARALELL PROCESSING AND REDUCING
+        //ALL HAIL STREAMS
         result.addAll(fromSub);
         return result;
     }
