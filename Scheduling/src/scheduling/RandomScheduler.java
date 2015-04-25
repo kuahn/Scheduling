@@ -15,41 +15,40 @@ public class RandomScheduler extends Scheduler {
     @Override
     public void startScheduling() {
         int numAttempts = 0;
-        while (!assignRandomBlocksAndTeachers() && numAttempts < 100) {
+        while (assignRandomBlocksAndTeachers() < 0 && numAttempts < 1000) {
             numAttempts++;
         }
-        //int[] sectionsDuringBlocks = new int[Block.blocks];
         System.out.println("Successfully randomly assigned sections to teachers and blocks after " + numAttempts + " attempts");
         System.out.println("Timings: " + temp.timings);
         System.out.println("Teachers: " + temp.teachers);
-        Map<Teacher, String> teacherSchedules = teachers.stream().collect(Collectors.toMap(teacher->teacher, teacher->temp.printSchedule(teacher)));
+        System.out.println("Locations: " + temp.locations);
+        Map<Teacher, String> teacherSchedules = teachers.stream().parallel().collect(Collectors.toMap(teacher->teacher, teacher->temp.getTeacherSchedule(teacher).toString()));
         System.out.println("Schedules for teachers: " + teacherSchedules);
+        Map<Room, String> roomSchedules = Room.getRooms().stream().parallel().collect(Collectors.toMap(room->room, room->temp.getRoomSchedule(room).toString()));
+        System.out.println("Schedules for rooms: " + roomSchedules);
         Stream<Student> unassignable = students.stream().filter(student->assignStudent(student) > 0);
         List<Student> unassignableStudents = unassignable.collect(Collectors.toList());
         System.out.println("Unassignable students: " + unassignableStudents);
+        Map<Student, String> studentSchedules = students.stream().parallel().collect(Collectors.toMap(student->student, student->temp.getStudentSchedule(student).toString()));
+        System.out.println("Schedules for students: " + studentSchedules);
     }
     public int assignStudent(Student student) {
         Random r = new Random();
-        Stream<Requirement> requirements = student.getRequirementStream(temp.roster);
-        List<Section> unfufilled = requirements.map(requirement->{
+        List<Requirement> requirements = student.getRequirements(temp.roster);
+        int numUn = 0;
+        for (Requirement requirement : requirements) {
             //The combination of parallel, filter, and findany makes this effectively a random selection, I think
             Optional<Section> toJoin = requirement.getSectionOptionStream().parallel().filter(section->canJoinClass(student, section)).findAny();
             if (!toJoin.isPresent()) {
                 System.out.println("Unable to fufill requirement " + requirement + " for student " + student);
-                return null;
+                numUn++;
+                continue;
             }
             Section section = toJoin.get();
             System.out.println("Adding " + student + " to " + section + " to fufill requirement " + requirement);
-            return section;
-        }).collect(Collectors.toList());//converting to list then back to stream because original was stream and there is a possibility for concurrentmodificationexception
-        return unfufilled.stream().mapToInt(section->{
-            if (section != null) {
-                temp.roster.setSection(student, section);//moved this down here
-                return 0;
-            } else {
-                return 1;
-            }
-        }).sum();
+            temp.roster.setSection(student, section);//moved this down here
+        }
+        return numUn;
     }
     public boolean canJoinClass(Student student, Section section) {
         Block sectionTime = temp.timings.get(section);
@@ -58,27 +57,46 @@ public class RandomScheduler extends Scheduler {
         }
         return temp.getStudentSection(student, sectionTime).isEmpty();//if the student is nowhere else during then that block
     }
-    public boolean assignRandomBlocksAndTeachers() {
-        Random r = new Random();
-        for (Section section : sections) {
+    static final int ASSIGN_ATTEMPTS = 1000;
+    public int assignRandomBlocksAndTeachers() {
+        Random rand = new Random();
+        int[] roomUsage = new int[Block.numBlocks];
+        int numSec = sections.size();
+        for (int sectionID = 0; sectionID < numSec; sectionID++) {
+            Section section = sections.get(sectionID);
             ArrayList<Teacher> posss = section.getTeachers();
-            Block b;
+            Block b = null;
             Teacher t;
             int numAttempts = 0;
             do {
-                t = posss.get(r.nextInt(posss.size()));
+                t = posss.get(rand.nextInt(posss.size()));
                 ArrayList<Block> workingBlocks = t.getWorkingBlocks();//some teachers only work some times, remember? grr
-                b = workingBlocks.get(r.nextInt(workingBlocks.size()));
+                if (workingBlocks.isEmpty()) {
+                    continue;
+                }
                 temp.teachers.put(section, t);
-                temp.timings.put(section, b);
+                for (Block c : workingBlocks) {
+                    b = c;
+                    temp.timings.put(section, b);
+                    if (temp.getTeacherLocation(t, b).size() <= 1) {
+                        roomUsage[b.blockID]++;
+                        break;
+                    }
+                }
                 numAttempts++;
-            } while (temp.getTeacherLocation(t, b).size() > 1 && numAttempts < 100);
-            if (numAttempts >= 100) {
-                temp.teachers.put(section, null);
-                temp.timings.put(section, null);
-                return false;
+            } while (temp.getTeacherLocation(t, b).size() > 1 && numAttempts < ASSIGN_ATTEMPTS);
+            if (numAttempts >= ASSIGN_ATTEMPTS) {
+                for (int i = 0; i <= sectionID; i++) {//reset all sections up to and including this one
+                    temp.teachers.put(sections.get(i), null);
+                    temp.timings.put(sections.get(i), null);
+                    temp.locations.put(sections.get(i), null);
+                }
+                return -1;//if unable to assign teachers and blocks, don't even try to assign rooms
             }
+            int room = roomUsage[b.blockID] - 1;
+            temp.locations.put(section, Room.getRoomArray()[room]);
+            // TODO deal with Klass.getAcceptableRooms()
         }
-        return true;
+        return 1;
     }
 }

@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 /**
@@ -43,10 +43,18 @@ public class Schedule {
     public List<Room> getStudentLocation(Student student, Block time) {//well, the student SHOULD only be in one room at once...
         return getStudentSectionStream(student, time).map(section->locations.get(section)).collect(Collectors.toList());
     }
-    public String printSchedule(Teacher teacher) {
-        Map<Block, Section> result = sections.stream()
-                .filter(section->teacher.equals(teachers.get(section)))//get the sections that this teacher is teaching
+    public Map<Block, Section> getSchedule(Predicate<Section> pred) {
+        return sections.stream()
+                .filter(pred)//get the sections that this teacher is teaching
                 .collect(Collectors.toMap(section->timings.get(section), section->section));//map of timings.get(section) to section
-        return result.toString();
+    }
+    public Map<Block, Section> getTeacherSchedule(Teacher teacher) {
+        return getSchedule(section->teacher.equals(teachers.get(section)));
+    }
+    public Map<Block, Section> getRoomSchedule(Room room) {
+        return getSchedule(section->room.equals(locations.get(section)));
+    }
+    public Map<Block, Section> getStudentSchedule(Student student) {
+        return roster.getSections(student).stream().parallel().collect(Collectors.toMap(section->timings.get(section), section->section));
     }
 }

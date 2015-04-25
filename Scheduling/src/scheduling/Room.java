@@ -1,39 +1,41 @@
 package scheduling;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 /**
  *
  * @author leijurv
  */
 public class Room {
-    private static final ArrayList<Room> rooms = new ArrayList<>();
-    private static final int[] roomNumbers={100,101,102,103,105,217,2356634};
+    private static final int[] roomNumbers = {100, 101, 102, 103, 104, 105, 106};
+    public static final int numRooms = roomNumbers.length;
+    private static final Room[] roomArray = new Room[numRooms];
+    private static final ArrayList<Room> rooms = new ArrayList<>(numRooms);//ensure capacity
     static{
-        for(int roomNumber : roomNumbers){
-            rooms.add(new Room(roomNumber));
+        for (int i = 0; i < numRooms; i++) {
+            Room r = new Room(roomNumbers[i]);
+            roomArray[i] = r;
+            rooms.add(r);
         }
     }
     final int roomNumber;
     private Room(int roomNumber) {
         this.roomNumber = roomNumber;
     }
-    public static Room getRoom(int roomNumber){
-        List<Room> matches=rooms.stream().parallel().filter(room->room.roomNumber==roomNumber).collect(Collectors.toList());
-        int numMatches=matches.size();
-        if(numMatches==0){
-            return null;
+    public static Room getRoom(int roomNumber) {
+        Optional<Room> matches = rooms.stream().parallel().filter(room->room.roomNumber == roomNumber).findAny();
+        if (matches.isPresent()) {
+            return matches.get();
         }
-        if(numMatches==1){
-            return matches.get(0);
-        }
-        throw new IllegalArgumentException("More than one room for "+roomNumber+": "+matches);
+        return null;
     }
-    public ArrayList<Room> getRooms(){
+    public static ArrayList<Room> getRooms() {
         return rooms;
     }
+    public static Room[] getRoomArray() {
+        return roomArray;
+    }
     @Override
-    public String toString(){
-        return "Room "+roomNumber;
+    public String toString() {
+        return "Room " + roomNumber;
     }
 }

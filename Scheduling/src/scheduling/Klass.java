@@ -11,7 +11,8 @@ public class Klass {
     final int numSections;
     final Section[] sections;
     final ArrayList<Teacher> teachers;
-    public Klass(String name, int numSections, Teacher[] customTeachers) {
+    final Room[] acceptableRooms;
+    public Klass(String name, int numSections, Teacher[] customTeachers, Room[] acceptableRooms) {
         this.name = name;
         this.numSections = numSections;
         sections = new Section[numSections];
@@ -19,6 +20,10 @@ public class Klass {
             sections[i] = new Section(this, i);
         }
         teachers = new ArrayList<>(Arrays.asList(customTeachers));
+        this.acceptableRooms = acceptableRooms;
+    }
+    public Klass(String name, int numSections, Teacher[] customTeachers) {
+        this(name, numSections, customTeachers, Room.getRoomArray());
     }
     public Klass(String name, int numSections) {
         this(name, numSections, new Teacher[] {});
