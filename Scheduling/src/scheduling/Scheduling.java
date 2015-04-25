@@ -61,6 +61,8 @@ public class Scheduling {
         Student.addRequiredSubject(Grade.GRADE10, language);
         createSubjects(Grade.GRADE9, subjects, students);
         createSubjects(Grade.GRADE10, subjects, students);
+        createSubjects(Grade.GRADE11, subjects, students);
+        createSubjects(Grade.GRADE12, subjects, students);
         RandomScheduler rd = new RandomScheduler(students, subjects);
         double numAt = 0;
         double numU = 0;
@@ -72,7 +74,6 @@ public class Scheduling {
             } catch (IllegalStateException e) {
                 String x = e.getMessage();
                 if (x.startsWith("S")) {
-                    long time = System.currentTimeMillis();
                     try {
                         int numUn = Integer.parseInt(x.substring(1, x.length()));
                         //System.out.println("did");
@@ -83,10 +84,9 @@ public class Scheduling {
                         System.out.println(e);
                         continue;
                     }
-                    System.out.println("Calc took " + (System.currentTimeMillis() - time));
                 }
-                //System.out.println(x + "," + numU + "," + numAt);
-                System.out.println(Math.floor(numU / (numAt) * 100) / 100 + " of " + students.size() + ", or " + toPercent(numU / (numAt * students.size())) + " of students, are unplacable on average over " + numAt + " attempts");
+                System.out.println("Just placed " + x.substring(1, x.length()) + " of " + 400);
+                System.out.println("On average, " + Math.floor(numU / (numAt) * 100) / 100 + " of " + students.size() + ", or " + toPercent(numU / (numAt * students.size())) + " of students, are unplacable. (Over " + numAt + " attempts)");
             }
         }
     }
