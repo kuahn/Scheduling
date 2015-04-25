@@ -1,5 +1,6 @@
 package scheduling;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Random;
 /**
  *
@@ -25,9 +26,32 @@ public class RandomScheduler extends Scheduler {
         for (Teacher teacher : teachers) {
             temp.printSchedule(teacher);
         }
+        for (Student student : students) {
+            assignStudent(student);
+        }
     }
-    public void assignStudent(Student student) {
+    public boolean assignStudent(Student student) {
+        Random r = new Random();
         ArrayList<ArrayList<Section>> requirements = student.getRequirements();
+        for (ArrayList<Section> klass : requirements) {
+            //The combination of parallel, filter, and findany makes this effectively a random selection, I think
+            Optional<Section> toJoin = klass.stream().parallel().filter(section->canJoinClass(student, section)).findAny();
+            if (!toJoin.isPresent()) {
+                System.out.println("Unable to fufill requirement " + klass + " for student " + student);
+                return false;
+            }
+            Section section = toJoin.get();
+            System.out.println("Adding " + student + " to " + section + " to fufill requirement " + klass);
+            temp.roster.setSection(student, section);
+        }
+        return true;
+    }
+    public boolean canJoinClass(Student student, Section section) {
+        Block sectionTime = temp.timings.get(section);
+        if (sectionTime == null) {
+            throw new IllegalArgumentException("must assign section times before class list");
+        }
+        return temp.getStudentSection(student, sectionTime).isEmpty();//if the student is nowhere else during then that block
     }
     public boolean assignRandomBlocksAndTeachers() {
         Random r = new Random();

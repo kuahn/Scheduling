@@ -31,6 +31,7 @@ public class Roster {
         ArrayList<Section> currentlyTaking = taking.get(student);
         Section conflict = findConflict(section, currentlyTaking);
         if (conflict != null) {
+            System.out.println("Conflict while trying to add " + student + " to " + section + ", removing " + conflict);
             remove(student, conflict);
         }
         roster.get(section).add(student);
