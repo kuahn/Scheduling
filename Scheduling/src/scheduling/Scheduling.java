@@ -18,6 +18,9 @@ public class Scheduling {
         Teacher shrek = new Teacher("Shrek");
         shrek.setDoesWork(0, false);
         shrek.setDoesWork(1, false);
+        shrek.setDoesWork(2, false);
+        shrek.setDoesWork(3, false);
+        shrek.setDoesWork(4, false);
         Teacher donkey = new Teacher("Donkey");
         donkey.setDoesWork(0, false);
         donkey.setDoesWork(2, false);
@@ -26,7 +29,7 @@ public class Scheduling {
         Subject history = new Subject("History", new String[] {"Swamp history"}, new int[] {2}, new Teacher[] {shrek});
         Student.addRequiredSubject(Grade.GRADE9, math);
         Student.addRequiredSubject(Grade.GRADE9, history);
-        Student dragon = new Student("Dragon", Grade.GRADE9);
+        Student dragon = new Student("Dragon", Grade.GRADE9, new Klass[] {math.klasses.get(0)});
         ArrayList<Student> students = new ArrayList<>(Arrays.asList(new Student[] {dragon}));
         System.out.println(dragon.getRequirements());
         ArrayList<Subject> subjects = new ArrayList<>(Arrays.asList(new Subject[] {math, history}));

@@ -1,7 +1,7 @@
 package scheduling;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 /**
  *
  * @author leijurv
@@ -22,13 +22,11 @@ public class RandomScheduler extends Scheduler {
         System.out.println("Successfully randomly assigned sections to teachers and blocks after " + numAttempts + " attempts");
         System.out.println("Timings: " + temp.timings);
         System.out.println("Teachers: " + temp.teachers);
-        System.out.println("Schedules for teachers: ");
-        for (Teacher teacher : teachers) {
-            temp.printSchedule(teacher);
-        }
-        for (Student student : students) {
-            assignStudent(student);
-        }
+        Map<Teacher, String> teacherSchedules = teachers.stream().collect(Collectors.toMap(teacher->teacher, teacher->temp.printSchedule(teacher)));
+        System.out.println("Schedules for teachers: " + teacherSchedules);
+        Stream<Student> unassignable = students.stream().filter(student->!assignStudent(student));
+        List<Student> unassignableStudents = unassignable.collect(Collectors.toList());
+        System.out.println("Unassignable students: " + unassignableStudents);
     }
     public boolean assignStudent(Student student) {
         Random r = new Random();

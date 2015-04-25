@@ -43,10 +43,10 @@ public class Schedule {
     public List<Room> getStudentLocation(Student student, Block time) {//well, the student SHOULD only be in one room at once...
         return getStudentSectionStream(student, time).map(section->locations.get(section)).collect(Collectors.toList());
     }
-    public void printSchedule(Teacher teacher) {
+    public String printSchedule(Teacher teacher) {
         Map<Block, Section> result = sections.stream()
                 .filter(section->teacher.equals(teachers.get(section)))//get the sections that this teacher is teaching
                 .collect(Collectors.toMap(section->timings.get(section), section->section));//map of timings.get(section) to section
-        System.out.println(teacher + ":" + result);
+        return result.toString();
     }
 }

@@ -44,7 +44,7 @@ public class Student {
         this(name, grade, new ArrayList<>());
     }
     public static ArrayList<ArrayList<Section>> unfufilledRequirements(Student student, Roster roster) {//TODO: check if it would be faster to return a List<Klass> in terms of how this function is called
-        Stream<Subject> reqSubjects = allRequiredSubjects.get(student.grade).stream();//stream of required subjects
+        Stream<Subject> reqSubjects = student.requiredSubjects.stream();//stream of required subjects
         Stream<Klass> reqKlasses = student.requiredClasses.stream();//stream of required klasses
         reqSubjects = reqSubjects.parallel();//make it parallel to make the filter operation faster
         reqKlasses = reqKlasses.parallel();//this is safe becasue Section.isIn is thread safe
