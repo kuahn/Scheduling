@@ -36,7 +36,7 @@ public class RandomScheduler extends Scheduler {
         Random r = new Random();
         List<Requirement> requirements = student.getRequirements(temp.roster);
         int numUn = 0;
-        for (Requirement requirement : requirements) {
+        for (Requirement requirement : requirements) {//This cannot be done in a parallel stream because canJoinClass depends on previous class joining
             //The combination of parallel, filter, and findany makes this effectively a random selection, I think
             Optional<Section> toJoin = requirement.getSectionOptionStream().parallel().filter(section->canJoinClass(student, section)).findAny();
             if (!toJoin.isPresent()) {
@@ -46,11 +46,11 @@ public class RandomScheduler extends Scheduler {
             }
             Section section = toJoin.get();
             System.out.println("Adding " + student + " to " + section + " to fufill requirement " + requirement);
-            temp.roster.setSection(student, section);//moved this down here
+            temp.roster.setSection(student, section);
         }
         return numUn;
     }
-    public boolean canJoinClass(Student student, Section section) {
+    public boolean canJoinClass(Student student, Section section) {// TODO implement maximum class size
         Block sectionTime = temp.timings.get(section);
         if (sectionTime == null) {
             throw new IllegalArgumentException("must assign section times before class list");

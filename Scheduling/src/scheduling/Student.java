@@ -1,7 +1,7 @@
 package scheduling;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 /**
@@ -30,7 +30,8 @@ public class Student {
         this.grade = grade;
         requirements = new ArrayList<>(allRequiredSubjects.get(grade));
         for (Klass klass : requiredClasses) {//if the student is required to take Algebra II, remove the redundant requirement to take one math class
-            requirements.remove(klass.getSubject());
+            requirements.remove(new SubjectRequirement(klass.getSubject(), null));
+            requirements.add(new KlassRequirement(klass));
         }
     }
     public Student(String name, Grade grade, Klass[] requiredClasses) {//to make it easier if you want to pass an array not arraylist
@@ -38,6 +39,9 @@ public class Student {
     }
     public Student(String name, Grade grade) {
         this(name, grade, new ArrayList<>());
+    }
+    public int getNumFreeBlocks() {
+        return Block.numBlocks - requirements.size();
     }
     public static ArrayList<Requirement> unfufilledRequirements(Student student, Roster roster) {
         return new ArrayList<>(unfufilledRequirementsStream(student, roster).collect(Collectors.toList()));
@@ -71,19 +75,6 @@ public class Student {
     public Stream<Requirement> getRequirementStream(Roster r) {
         return unfufilledRequirementsStream(this, r);
     }
-    /*
-     private ArrayList<ArrayList<Section>> calculateRequirements() {
-     ArrayList<ArrayList<Section>> result = new ArrayList<>(requiredClasses.stream().map(k->new ArrayList<>(Arrays.asList(k.sections))).collect(Collectors.toList()));
-     for (Subject s : requiredSubjects) {
-     ArrayList<Section> thisSubject = new ArrayList<>();
-     for (Klass k : s.klasses) {
-     thisSubject.addAll(Arrays.asList(k.sections));//can take any section within any klass of this section to fufill the requirement
-     // TODO see if Java can combine a stream<list> into a list
-     }
-     result.add(thisSubject);
-     }
-     return result;
-     }*/
     @Override
     public String toString() {
         return name;
