@@ -5,11 +5,17 @@ import java.util.ArrayList;
  * @author leijurv
  */
 public class Section {
+    public static final int MAX_CLASS_SIZE = 20;
     final Klass klass;
     final int sectionID;
-    public Section(Klass klass, int sectionID) {
+    final int max_size;
+    public Section(Klass klass, int sectionID, int max_size) {
         this.klass = klass;
         this.sectionID = sectionID;
+        this.max_size = max_size;
+    }
+    public Section(Klass klass, int sectionID) {
+        this(klass, sectionID, MAX_CLASS_SIZE);
     }
     public boolean isIn(Klass klass) {
         return klass.equals(this.klass);
@@ -34,5 +40,8 @@ public class Section {
     }
     public ArrayList<Teacher> getTeachers() {
         return klass.getTeachers();
+    }
+    public boolean canFitAnotherStudent(int currentSize) {
+        return currentSize < max_size;
     }
 }
