@@ -101,16 +101,16 @@ public class Scheduling {
         Map<Teacher, Map<Block, Section>> teacherSchedules = rd.teachers.stream().parallel().collect(Collectors.toMap(teacher->teacher, teacher->schedule.getTeacherSchedule(teacher)));
         Map<Room, Map<Block, Section>> roomSchedules = Room.getRooms().stream().parallel().collect(Collectors.toMap(room->room, room->schedule.getRoomSchedule(room)));
         Map<Student, Map<Block, Section>> studentSchedules = rd.students.stream().parallel().collect(Collectors.toMap(student->student, student->schedule.getStudentSchedule(student)));
-        String basePath = "/Users/leijurv/Documents/schedout/";
+        String basePath = System.getProperty("user.home") + "/Documents/schedout/";
         File base = new File(basePath);
         File main = new File(basePath + "sections.csv");
+        schedule.roster.write(new File(basePath + "roster"));
         try(FileWriter writer = new FileWriter(main)) {
             writer.write("Section,Block,Teacher,Room\n");
             for (Section section : schedule.sections) {
                 writer.write(section + "," + schedule.timings.get(section).blockID + "," + schedule.teachers.get(section) + "," + schedule.locations.get(section).roomNumber + "\n");
             }
         }
-        schedule.roster.write(new File(basePath + "roster"));
         new File(basePath + "teachers").mkdir();
         new File(basePath + "students").mkdir();
         new File(basePath + "rooms").mkdir();

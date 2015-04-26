@@ -94,7 +94,7 @@ public class Roster {
         }
     }
     public void write(File directory) throws IOException {
-        directory.mkdir();
+        directory.mkdirs();
         for (Section section : sections) {
             File f = new File(directory.toString() + File.separatorChar + section.toString() + ".csv");
             try(FileWriter dank = new FileWriter(f)) {
