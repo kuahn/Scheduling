@@ -4,8 +4,13 @@
  * and open the template in the editor.
  */
 package scheduling;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 /**
  *
  * @author leijurv
@@ -51,7 +56,7 @@ public class Scheduling {
             students.add(dragon);
         }
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ArrayList<Student> students = new ArrayList<>();
         ArrayList<Subject> subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++))};
@@ -70,7 +75,7 @@ public class Scheduling {
         while (true) {
             try {
                 rd.startScheduling();
-                return;
+                break;
             } catch (IllegalStateException e) {
                 String x = e.getMessage();
                 if (x.startsWith("S")) {
@@ -86,7 +91,46 @@ public class Scheduling {
                     }
                 }
                 System.out.println("Just placed " + x.substring(1, x.length()) + " of " + 400);
-                System.out.println("On average, " + Math.floor(numU / (numAt) * 100) / 100 + " of " + students.size() + ", or " + toPercent(numU / (numAt * students.size())) + " of students, are unplacable. (Over " + numAt + " attempts)");
+                System.out.println("On average, " + Math.floor(numU / (numAt) * 100) / 100 + " of " + students.size() + ", or " + toPercent(numU / (numAt * students.size())) + " of students, are unplacable. (" + numAt + " attempts)");
+            }
+        }
+        output(rd);
+    }
+    public static void output(Scheduler rd) throws IOException {
+        Schedule schedule = rd.getResult();
+        Map<Teacher, Map<Block, Section>> teacherSchedules = rd.teachers.stream().parallel().collect(Collectors.toMap(teacher->teacher, teacher->schedule.getTeacherSchedule(teacher)));
+        Map<Room, Map<Block, Section>> roomSchedules = Room.getRooms().stream().parallel().collect(Collectors.toMap(room->room, room->schedule.getRoomSchedule(room)));
+        Map<Student, Map<Block, Section>> studentSchedules = rd.students.stream().parallel().collect(Collectors.toMap(student->student, student->schedule.getStudentSchedule(student)));
+        String basePath = "/Users/leijurv/Documents/schedout/";
+        File base = new File(basePath);
+        File main = new File(basePath + "sections.csv");
+        try(FileWriter writer = new FileWriter(main)) {
+            writer.write("Section,Block,Teacher,Room\n");
+            for (Section section : schedule.sections) {
+                writer.write(section + "," + schedule.timings.get(section).blockID + "," + schedule.teachers.get(section) + "," + schedule.locations.get(section).roomNumber + "\n");
+            }
+        }
+        schedule.roster.write(new File(basePath + "roster"));
+        new File(basePath + "teachers").mkdir();
+        new File(basePath + "students").mkdir();
+        new File(basePath + "rooms").mkdir();
+        for (Teacher teacher : rd.teachers) {
+            write(base, teacherSchedules.get(teacher), schedule, "teachers", teacher.toString());
+        }
+        for (Student student : rd.students) {
+            write(base, studentSchedules.get(student), schedule, "students", student.toString());
+        }
+        for (Room room : Room.getRoomArray()) {
+            write(base, roomSchedules.get(room), schedule, "rooms", room.toString());
+        }
+    }
+    public static void write(File main, Map<Block, Section> data, Schedule schedule, String folderName, String thisName) throws IOException {
+        main = new File(main.toString() + File.separatorChar + folderName + File.separatorChar + thisName + ".csv");
+        try(FileWriter writer = new FileWriter(main)) {
+            writer.write("Section,Block,Teacher,Room\n");
+            for (Block b : data.keySet()) {
+                Section section = data.get(b);
+                writer.write(section + "," + schedule.timings.get(section).blockID + "," + schedule.teachers.get(section) + "," + schedule.locations.get(section).roomNumber + "\n");
             }
         }
     }

@@ -61,6 +61,7 @@ public class RandomScheduler extends Scheduler {
         Map<Student, String> studentSchedules = students.stream().parallel().collect(Collectors.toMap(student->student, student->temp.getStudentSchedule(student).toString()));
         System.out.println("Schedules for students: " + studentSchedules);
         temp.roster.print();
+        result = temp;
     }
     private void printSched() {
         for (Section section : sections) {

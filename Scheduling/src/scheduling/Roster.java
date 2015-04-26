@@ -1,4 +1,7 @@
 package scheduling;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,6 +91,19 @@ public class Roster {
         ArrayList<Section> takin = new ArrayList<>(getSections(student));
         for (Section s : takin) {
             remove(student, s);
+        }
+    }
+    public void write(File directory) throws IOException {
+        directory.mkdir();
+        for (Section section : sections) {
+            File f = new File(directory.toString() + File.separatorChar + section.toString() + ".csv");
+            try(FileWriter dank = new FileWriter(f)) {
+                dank.write("Student\n");
+                for (Student student : roster.get(section)) {
+                    dank.write(student.toString());
+                    dank.write("\n");
+                }
+            }
         }
     }
 }
