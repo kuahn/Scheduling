@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 /**
  *
@@ -52,34 +53,41 @@ public class Roster {
         }
     }
     public Section getSection(Klass klass, Student student) {//In a certian klass, what section is this student in?
-        for (Section section : getSections(student)) {
-            if (section.isIn(klass)) {
-                return section;
-            }
+        Optional<Section> result = getSections(student).parallelStream().filter(section->section.isIn(klass)).findAny();
+        if (result.isPresent()) {
+            return result.get();
         }
         return null;
     }
     public List<Section> getSections(Subject subject, Student student) {//same, but a student can be in multiple sections of the same subject
-        return new ArrayList<>(getSections(student)).stream().parallel().filter((currentlyTaking)->(currentlyTaking.isIn(subject))).collect(Collectors.toList());
+        return new ArrayList<>(getSections(student)).parallelStream().filter((currentlyTaking)->(currentlyTaking.isIn(subject))).collect(Collectors.toList());
     }
     public ArrayList<Section> getSections(Student student) {
         synchronized (lock) {
             return taking.get(student);
         }
     }
-    public static Section findConflict(Section section, ArrayList<Section> currentlyTaking) {
-        for (Section previous : currentlyTaking) {
-            if (previous.conflictsWith(section)) {
-                return previous;
-            }
+    public static Section findConflict(Section section, ArrayList<Section> current) {
+        Optional<Section> result = current.parallelStream().filter(previous->previous.conflictsWith(section)).findAny();
+        if (result.isPresent()) {
+            return result.get();
         }
         return null;
     }
-    public void print() {
+    @Override
+    public String toString() {
         synchronized (lock) {
-            for (Section section : sections) {
-                System.out.println(section + " class list: " + roster.get(section));
-            }
+            /*Equivalent to
+             System.out.println("Class lists:");
+             for(Section section : sections){
+             System.out.println(section->section + " class list: " + roster.get(section));
+             }
+             System.out.println();
+
+             but this is more OO (and quite possibly faster?)
+             */
+            String s = sections.parallelStream().map(section->section + " class list: " + roster.get(section)).collect(Collectors.joining("\n", "Class lists:\n", "\n"));
+            return s;
         }
     }
     public int numStudents(Section section) {

@@ -25,7 +25,7 @@ public class Room {
         this.roomNumber = roomNumber;
     }
     public static Room getRoom(int roomNumber) {
-        Optional<Room> matches = rooms.stream().parallel().filter(room->room.roomNumber == roomNumber).findAny();
+        Optional<Room> matches = rooms.parallelStream().filter(room->room.roomNumber == roomNumber).findAny();
         if (matches.isPresent()) {
             return matches.get();
         }

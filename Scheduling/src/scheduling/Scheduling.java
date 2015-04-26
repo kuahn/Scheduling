@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 /**
  *
  * @author leijurv
@@ -104,9 +103,9 @@ public class Scheduling {
     }
     public static void output(Scheduler rd) throws IOException {
         Schedule schedule = rd.getResult();
-        Map<Teacher, Map<Block, Section>> teacherSchedules = rd.teachers.stream().parallel().collect(Collectors.toMap(teacher->teacher, teacher->schedule.getTeacherSchedule(teacher)));
-        Map<Room, Map<Block, Section>> roomSchedules = Room.getRooms().stream().parallel().collect(Collectors.toMap(room->room, room->schedule.getRoomSchedule(room)));
-        Map<Student, Map<Block, Section>> studentSchedules = rd.students.stream().parallel().collect(Collectors.toMap(student->student, student->schedule.getStudentSchedule(student)));
+        Map<Teacher, Map<Block, Section>> teacherSchedules = schedule.getTeacherSchedules(rd.teachers);
+        Map<Room, Map<Block, Section>> roomSchedules = schedule.getRoomSchedules();
+        Map<Student, Map<Block, Section>> studentSchedules = schedule.getStudentSchedules();
         String basePath = System.getProperty("user.home") + "/Documents/schedout/";
         File base = new File(basePath);
         File main = new File(basePath + "sections.csv");

@@ -1,6 +1,5 @@
 package scheduling;
 import java.util.*;
-import java.util.stream.Collectors;
 /**
  *
  * @author leijurv
@@ -60,20 +59,17 @@ public class RandomScheduler extends Scheduler {
             throw new IllegalStateException("S" + toAssign.size());
         }
         printSched();
-        Map<Student, String> studentSchedules = students.stream().parallel().collect(Collectors.toMap(student->student, student->temp.getStudentSchedule(student).toString()));
-        System.out.println("Schedules for students: " + studentSchedules);
-        temp.roster.print();
+        System.out.println("Schedules for students: " + temp.getStudentSchedules());
+        System.out.println(temp.roster);
         result = temp;
     }
     private void printSched() {
         for (Section section : sections) {
             System.out.println(section + " at " + temp.timings.get(section) + " taught by " + temp.teachers.get(section) + " in " + temp.locations.get(section));
         }
-        Map<Teacher, String> teacherSchedules = teachers.stream().parallel().collect(Collectors.toMap(teacher->teacher, teacher->temp.getTeacherSchedule(teacher).toString()));
-        System.out.println("Schedules for teachers: " + teacherSchedules);
+        System.out.println("Schedules for teachers: " + temp.getTeacherSchedules(teachers));
         try {
-            Map<Room, String> roomSchedules = Room.getRooms().stream().parallel().collect(Collectors.toMap(room->room, room->temp.getRoomSchedule(room).toString()));
-            System.out.println("Schedules for rooms: " + roomSchedules);
+            System.out.println("sshedules for rooms: " + temp.getRoomSchedules());
         } catch (IllegalStateException e) {
             System.out.println("OUT OF ROOMS");
             System.exit(0);

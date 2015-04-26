@@ -35,13 +35,13 @@ public class Schedule {
     }
     public List<Section> getTeacherLocation(Teacher teacher, Block time) {//well, the teacher SHOULD only be in one place...
         //this can be parallel because hashmaps are thread safe if the only operations happening are read only
-        return sections.stream().parallel().filter(section->time.equals(timings.get(section)) && teacher.equals(teachers.get(section))).collect(Collectors.toList());
+        return sections.parallelStream().filter(section->time.equals(timings.get(section)) && teacher.equals(teachers.get(section))).collect(Collectors.toList());
     }
     public List<Section> getRoomUsage(Room room, Block time) {//well, there SHOULD only be one section in each room at once...
-        return sections.stream().parallel().filter(section->time.equals(timings.get(section)) && room.equals(locations.get(section))).collect(Collectors.toList());
+        return sections.parallelStream().filter(section->time.equals(timings.get(section)) && room.equals(locations.get(section))).collect(Collectors.toList());
     }
     public Stream<Section> getStudentSectionStream(Student student, Block time) {//well, the student SHOULD only be in one section at once..
-        return roster.getSections(student).stream().parallel().filter(section->time.equals(timings.get(section)));
+        return roster.getSections(student).parallelStream().filter(section->time.equals(timings.get(section)));
     }
     public List<Section> getStudentSection(Student student, Block time) {
         return getStudentSectionStream(student, time).collect(Collectors.toList());
@@ -50,7 +50,7 @@ public class Schedule {
         return getStudentSectionStream(student, time).map(section->locations.get(section)).collect(Collectors.toList());
     }
     public Map<Block, Section> getSchedule(Predicate<Section> pred) {
-        return sections.stream()
+        return sections.parallelStream()
                 .filter(pred)//get the sections that this teacher is teaching
                 .collect(Collectors.toMap(section->timings.get(section), section->section));//map of timings.get(section) to section
     }
@@ -61,6 +61,15 @@ public class Schedule {
         return getSchedule(section->room.equals(locations.get(section)));
     }
     public Map<Block, Section> getStudentSchedule(Student student) {
-        return roster.getSections(student).stream().parallel().collect(Collectors.toMap(section->timings.get(section), section->section));
+        return roster.getSections(student).parallelStream().collect(Collectors.toMap(section->timings.get(section), section->section));
+    }
+    public Map<Teacher, Map<Block, Section>> getTeacherSchedules(List<Teacher> teacherz) {
+        return teacherz.parallelStream().collect(Collectors.toMap(teacher->teacher, teacher->getTeacherSchedule(teacher)));
+    }
+    public Map<Student, Map<Block, Section>> getStudentSchedules() {
+        return students.parallelStream().collect(Collectors.toMap(student->student, student->getStudentSchedule(student)));
+    }
+    public Map<Room, Map<Block, Section>> getRoomSchedules() {
+        return Room.getRooms().parallelStream().collect(Collectors.toMap(room->room, room->getRoomSchedule(room)));
     }
 }
