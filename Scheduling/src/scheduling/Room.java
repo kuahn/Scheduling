@@ -6,7 +6,7 @@ import java.util.Optional;
  * @author leijurv
  */
 public class Room {
-    private static final int[] roomNumbers = new int[50];
+    private static final int[] roomNumbers = new int[18];
     public static final int numRooms = roomNumbers.length;
     private static final Room[] roomArray = new Room[numRooms];
     private static final ArrayList<Room> rooms = new ArrayList<>(numRooms);//ensure capacity

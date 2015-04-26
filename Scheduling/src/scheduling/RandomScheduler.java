@@ -136,12 +136,11 @@ public class RandomScheduler extends Scheduler {
                     b = workingBlocks.remove(rand.nextInt(workingBlocks.size()));
                     temp.timings.put(section, b);
                     if (temp.getTeacherLocation(t, b).size() <= 1 && roomUsage[b.blockID] < numRooms) {
-                        roomUsage[b.blockID]++;
                         break;
                     }
                 }
                 numAttempts++;
-            } while (temp.getTeacherLocation(t, b).size() > 1 && numAttempts < TEACHER_ASSIGN_ATTEMPTS);
+            } while ((temp.getTeacherLocation(t, b).size() > 1 || roomUsage[b.blockID] >= numRooms) && numAttempts < TEACHER_ASSIGN_ATTEMPTS);
             if (numAttempts >= TEACHER_ASSIGN_ATTEMPTS) {
                 for (int i = 0; i <= sectionID; i++) {//reset all sections up to and including this one
                     temp.teachers.put(sectionz.get(i), null);
@@ -150,7 +149,7 @@ public class RandomScheduler extends Scheduler {
                 }
                 return -1;//if unable to assign teachers and blocks, don't even try to assign rooms
             }
-            int room = roomUsage[b.blockID] - 1;
+            int room = roomUsage[b.blockID]++;
             temp.locations.put(section, Room.getRoomArray()[room]);
             // TODO deal with Klass.getAcceptableRooms()
         }
