@@ -12,13 +12,12 @@ public class RandomScheduler extends Scheduler {
         temp = new Schedule(this.sections, this.students);
     }
     final static int STUDENT_ASSIGN_ATTEMPTS = 5;
-    static final int TEACHER_ASSIGN_ATTEMPTS = 10;
+    static final int TEACHER_ASSIGN_ATTEMPTS = 5;
     static final int TOTAL_ASSIGN_ATTEMPTS = 1000;
     static final boolean PRINT_ADDS = false;
     static final boolean PRINT_UNF = false;
     static final boolean PRINT_ATT = false;
     static final boolean PRINT_INIT = false;
-    int completeAttemptsSoFar = 0;
     @Override
     public void startScheduling() {
         int numAttempts = 0;
@@ -27,6 +26,9 @@ public class RandomScheduler extends Scheduler {
         }
         if (numAttempts >= TOTAL_ASSIGN_ATTEMPTS) {
             throw new IllegalStateException("I");
+        }
+        if (!temp.verifyRoomsTeachers(teachers)) {
+            throw new ArrayIndexOutOfBoundsException("jankydank. verification for first step failed. you broke something");
         }
         //System.out.println("Successfully randomly assigned sections to teachers and blocks after " + numAttempts + " attempts");
         if (PRINT_INIT) {
@@ -122,23 +124,24 @@ public class RandomScheduler extends Scheduler {
         for (int sectionID = 0; sectionID < numSec; sectionID++) {
             Section section = sectionz.get(sectionID);
             ArrayList<Teacher> posss = section.getTeachers();
-            Block b = null;
+            Block b;
             Teacher t;
             int numAttempts = 0;
             do {
                 t = posss.get(rand.nextInt(posss.size()));
                 ArrayList<Block> workingBlocks = new ArrayList<>(t.getWorkingBlocks());//some teachers only work some times, remember? grr
                 if (workingBlocks.isEmpty()) {
-                    continue;
+                    //continue;
+                    //if this continues, netbeans complains because b might not be initialized in temp.getTeacherLocation in the while condition on line 144
                 }
                 temp.teachers.put(section, t);
-                while (!workingBlocks.isEmpty()) {
+                do {
                     b = workingBlocks.remove(rand.nextInt(workingBlocks.size()));
                     temp.timings.put(section, b);
                     if (temp.getTeacherLocation(t, b).size() <= 1 && roomUsage[b.blockID] < numRooms) {
                         break;
                     }
-                }
+                } while (!workingBlocks.isEmpty());
                 numAttempts++;
             } while ((temp.getTeacherLocation(t, b).size() > 1 || roomUsage[b.blockID] >= numRooms) && numAttempts < TEACHER_ASSIGN_ATTEMPTS);
             if (numAttempts >= TEACHER_ASSIGN_ATTEMPTS) {

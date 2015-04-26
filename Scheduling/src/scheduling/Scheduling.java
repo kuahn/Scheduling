@@ -71,7 +71,7 @@ public class Scheduling {
         RandomScheduler rd = new RandomScheduler(students, subjects);
         double numAt = 0;
         double numU = 0;
-        int numStud = students.size();
+        long time = System.currentTimeMillis();
         while (true) {
             try {
                 rd.startScheduling();
@@ -90,8 +90,14 @@ public class Scheduling {
                         continue;
                     }
                 }
+                long currTime = System.currentTimeMillis();
+                long diff = currTime - time;
+                double speed = diff;
+                speed = numAt / speed;
+                speed = speed * 1000;
                 System.out.println("Just placed " + x.substring(1, x.length()) + " of " + 400);
                 System.out.println("On average, " + Math.floor(numU / (numAt) * 100) / 100 + " of " + students.size() + ", or " + toPercent(numU / (numAt * students.size())) + " of students, are unplacable. (" + numAt + " attempts)");
+                System.out.println(diff / 1000 + " seconds, on average " + speed + " guesses/sec");
             }
         }
         output(rd);

@@ -1,8 +1,5 @@
 package scheduling;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,7 +22,16 @@ public class Schedule {
         this.students = students;
         this.roster = new Roster(students, sections);
     }
-    public void findConflicts() {
+    public boolean verifyRoomsTeachers(ArrayList<Teacher> teacherz) {
+        for (Block block : Block.blocks) {
+            if (!Room.getRooms().parallelStream().noneMatch((room)->(getRoomUsage(room, block).size() > 1))) {
+                return false;
+            }
+            if (!teacherz.parallelStream().noneMatch((t)->(getTeacherLocation(t, block).size() > 1))) {
+                return false;
+            }
+        }
+        return true;
     }
     public List<Section> getTeacherLocation(Teacher teacher, Block time) {//well, the teacher SHOULD only be in one place...
         //this can be parallel because hashmaps are thread safe if the only operations happening are read only
