@@ -4,12 +4,9 @@
  * and open the template in the editor.
  */
 package scheduling;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 /**
  *
  * @author leijurv
@@ -55,8 +52,15 @@ public class Scheduling {
             students.add(dragon);
         }
     }
+    static double numAt = 0;
+    static double numU = 0;
+    static long time = 0;
+    static RandomScheduler rd;
+    static int numStud = 0;
+    static ArrayList<Student> students;
+    static boolean running = false;
     public static void main(String[] args) throws IOException {
-        ArrayList<Student> students = new ArrayList<>();
+        students = new ArrayList<>();
         ArrayList<Subject> subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++))};
         language = new Subject("Language", new String[] {"Spanish 1", "Spanish 2", "Japanese 1", "Japanese 2", "Mandarin 1", "Mandarin 2"}, new int[] {2, 2, 2, 2, 2, 2}, langTeach, 18);
@@ -67,11 +71,18 @@ public class Scheduling {
         createSubjects(Grade.GRADE10, subjects, students);
         createSubjects(Grade.GRADE11, subjects, students);
         createSubjects(Grade.GRADE12, subjects, students);
-        RandomScheduler rd = new RandomScheduler(students, subjects);
-        double numAt = 0;
-        double numU = 0;
-        long time = System.currentTimeMillis();
-        while (true) {
+        numStud = students.size();
+        rd = new RandomScheduler(students, subjects);
+        Gooey.setup();
+        //System.exit(0);
+    }
+    public static void start() {
+        if (rd.isFinished() || running) {
+            return;
+        }
+        time = System.currentTimeMillis();
+        running = true;
+        while (running) {
             try {
                 rd.startScheduling();
                 break;
@@ -89,57 +100,16 @@ public class Scheduling {
                         continue;
                     }
                 }
-                long currTime = System.currentTimeMillis();
-                long diff = currTime - time;
-                double speed = diff;
-                speed = numAt / speed;
-                speed = speed * 1000;
-                System.out.println("Just placed " + x.substring(1, x.length()) + " of " + 400);
-                System.out.println("On average, " + Math.floor(numU / (numAt) * 100) / 100 + " of " + students.size() + ", or " + toPercent(numU / (numAt * students.size())) + " of students, are unplacable. (" + numAt + " attempts)");
-                System.out.println(diff / 1000 + " seconds, on average " + speed + " guesses/sec");
+            }
+            Gooey.infotab.repaint();
+        }
+        if (running) {
+            Gooey.onFinish();
+            try {
+                Schedule.output(rd);
+            } catch (IOException ex) {
             }
         }
-        output(rd);
-    }
-    public static void output(Scheduler rd) throws IOException {
-        Schedule schedule = rd.getResult();
-        Map<Teacher, Map<Block, Section>> teacherSchedules = schedule.getTeacherSchedules(rd.teachers);
-        Map<Room, Map<Block, Section>> roomSchedules = schedule.getRoomSchedules();
-        Map<Student, Map<Block, Section>> studentSchedules = schedule.getStudentSchedules();
-        String basePath = System.getProperty("user.home") + "/Documents/schedout/";
-        File base = new File(basePath);
-        File main = new File(basePath + "sections.csv");
-        schedule.roster.write(new File(basePath + "roster"));
-        try(FileWriter writer = new FileWriter(main)) {
-            writer.write("Section,Block,Teacher,Room\n");
-            for (Section section : schedule.sections) {
-                writer.write(section + "," + schedule.timings.get(section).blockID + "," + schedule.teachers.get(section) + "," + schedule.locations.get(section).roomNumber + "\n");
-            }
-        }
-        new File(basePath + "teachers").mkdir();
-        new File(basePath + "students").mkdir();
-        new File(basePath + "rooms").mkdir();
-        for (Teacher teacher : rd.teachers) {
-            write(base, teacherSchedules.get(teacher), schedule, "teachers", teacher.toString());
-        }
-        for (Student student : rd.students) {
-            write(base, studentSchedules.get(student), schedule, "students", student.toString());
-        }
-        for (Room room : Room.getRoomArray()) {
-            write(base, roomSchedules.get(room), schedule, "rooms", room.toString());
-        }
-    }
-    public static void write(File main, Map<Block, Section> data, Schedule schedule, String folderName, String thisName) throws IOException {
-        main = new File(main.toString() + File.separatorChar + folderName + File.separatorChar + thisName + ".csv");
-        try(FileWriter writer = new FileWriter(main)) {
-            writer.write("Section,Block,Teacher,Room\n");
-            for (Block b : data.keySet()) {
-                Section section = data.get(b);
-                writer.write(section + "," + schedule.timings.get(section).blockID + "," + schedule.teachers.get(section) + "," + schedule.locations.get(section).roomNumber + "\n");
-            }
-        }
-    }
-    public static String toPercent(double v) {
-        return Math.floor(v * 10000) / 100 + "%";
+        running = false;
     }
 }

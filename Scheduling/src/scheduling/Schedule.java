@@ -1,4 +1,7 @@
 package scheduling;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -71,5 +74,43 @@ public class Schedule {
     }
     public Map<Room, Map<Block, Section>> getRoomSchedules() {
         return Room.getRooms().parallelStream().collect(Collectors.toMap(room->room, room->getRoomSchedule(room)));
+    }
+    public static void output(Scheduler rd) throws IOException {
+        Schedule schedule = rd.getResult();
+        Map<Teacher, Map<Block, Section>> teacherSchedules = schedule.getTeacherSchedules(rd.teachers);
+        Map<Room, Map<Block, Section>> roomSchedules = schedule.getRoomSchedules();
+        Map<Student, Map<Block, Section>> studentSchedules = schedule.getStudentSchedules();
+        String basePath = System.getProperty("user.home") + "/Documents/schedout/";
+        File base = new File(basePath);
+        File main = new File(basePath + "sections.csv");
+        schedule.roster.write(new File(basePath + "roster"));
+        try(FileWriter writer = new FileWriter(main)) {
+            writer.write("Section,Block,Teacher,Room\n");
+            for (Section section : schedule.sections) {
+                writer.write(section + "," + schedule.timings.get(section).blockID + "," + schedule.teachers.get(section) + "," + schedule.locations.get(section).roomNumber + "\n");
+            }
+        }
+        new File(basePath + "teachers").mkdir();
+        new File(basePath + "students").mkdir();
+        new File(basePath + "rooms").mkdir();
+        for (Teacher teacher : rd.teachers) {
+            write(base, teacherSchedules.get(teacher), schedule, "teachers", teacher.toString());
+        }
+        for (Student student : rd.students) {
+            write(base, studentSchedules.get(student), schedule, "students", student.toString());
+        }
+        for (Room room : Room.getRoomArray()) {
+            write(base, roomSchedules.get(room), schedule, "rooms", room.toString());
+        }
+    }
+    public static void write(File main, Map<Block, Section> data, Schedule schedule, String folderName, String thisName) throws IOException {
+        main = new File(main.toString() + File.separatorChar + folderName + File.separatorChar + thisName + ".csv");
+        try(FileWriter writer = new FileWriter(main)) {
+            writer.write("Section,Block,Teacher,Room\n");
+            for (Block b : data.keySet()) {
+                Section section = data.get(b);
+                writer.write(section + "," + schedule.timings.get(section).blockID + "," + schedule.teachers.get(section) + "," + schedule.locations.get(section).roomNumber + "\n");
+            }
+        }
     }
 }

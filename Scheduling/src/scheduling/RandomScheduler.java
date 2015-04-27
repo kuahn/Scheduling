@@ -17,13 +17,42 @@ public class RandomScheduler extends Scheduler {
     static final boolean PRINT_UNF = false;
     static final boolean PRINT_ATT = false;
     static final boolean PRINT_INIT = false;
+    ArrayList<Integer> randomAssignAttempts = new ArrayList<>();
+    int allowedAttempts = 0;
+    double average = 0;
+    int max = 0;
+    public int calcAttempts() {
+        if (randomAssignAttempts.isEmpty()) {
+            return TOTAL_ASSIGN_ATTEMPTS;
+        }
+        OptionalDouble avg = randomAssignAttempts.parallelStream().mapToInt(x->x).average();
+        if (avg.isPresent()) {
+            double d = avg.getAsDouble() * 2 + 2;
+            average = (d - 2) / 2;
+            int dd = (int) Math.ceil(d);
+            if (dd >= TOTAL_ASSIGN_ATTEMPTS) {
+                return TOTAL_ASSIGN_ATTEMPTS;
+            }
+            return dd;
+        }
+        return TOTAL_ASSIGN_ATTEMPTS;
+    }
     @Override
     public void startScheduling() {
+        if (isFinished()) {
+            System.out.println("Already finished");
+            return;
+        }
         int numAttempts = 0;
-        while (assignRandomBlocksAndTeachers() < 0 && numAttempts < TOTAL_ASSIGN_ATTEMPTS) {
+        allowedAttempts = calcAttempts();
+        while (assignRandomBlocksAndTeachers() < 0 && numAttempts < allowedAttempts) {
             numAttempts++;
         }
-        if (numAttempts >= TOTAL_ASSIGN_ATTEMPTS) {
+        randomAssignAttempts.add(numAttempts);
+        if (numAttempts > max) {
+            max = numAttempts;
+        }
+        if (numAttempts >= allowedAttempts) {
             throw new IllegalStateException("I");
         }
         if (!temp.verifyRoomsTeachers(teachers)) {
