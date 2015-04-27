@@ -58,10 +58,11 @@ public class Scheduling {
     static RandomScheduler rd;
     static int numStud = 0;
     static ArrayList<Student> students;
+    static ArrayList<Subject> subjects;
     static boolean running = false;
     public static void main(String[] args) throws IOException {
         students = new ArrayList<>();
-        ArrayList<Subject> subjects = new ArrayList<>();
+        subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++))};
         language = new Subject("Language", new String[] {"Spanish 1", "Spanish 2", "Japanese 1", "Japanese 2", "Mandarin 1", "Mandarin 2"}, new int[] {2, 2, 2, 2, 2, 2}, langTeach, 18);
         subjects.add(language);

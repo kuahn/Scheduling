@@ -15,6 +15,9 @@ public class Gooey {
         infotab = new InfoTab();
         studentstab = new StudentsTab();
         tabs.add(studentstab, "Students");
+        tabs.add(new TeachersTab(), "Teachers");
+        tabs.add(new SubjectsTab(), "Subjects");
+        tabs.add(new RoomsTab(), "Rooms");
         tabs.add(infotab, "Info");
     }
     public static void setup() {
