@@ -1,4 +1,4 @@
-package scheduling;
+package scheduling.gooey;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -8,6 +8,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import scheduling.Scheduling;
+import scheduling.Subject;
 /**
  *
  * @author leijurv

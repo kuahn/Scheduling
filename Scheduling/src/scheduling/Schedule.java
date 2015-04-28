@@ -11,12 +11,12 @@ import java.util.stream.Stream;
  * @author leijurv
  */
 public class Schedule {
-    final HashMap<Section, Room> locations;
-    final HashMap<Section, Block> timings;
-    final HashMap<Section, Teacher> teachers;
-    final ArrayList<Section> sections;
-    final ArrayList<Student> students;
-    final Roster roster;
+    public final HashMap<Section, Room> locations;
+    public final HashMap<Section, Block> timings;
+    public final HashMap<Section, Teacher> teachers;
+    public final ArrayList<Section> sections;
+    public final ArrayList<Student> students;
+    public final Roster roster;
     public Schedule(ArrayList<Section> sections, ArrayList<Student> students) {
         locations = new HashMap<>();
         timings = new HashMap<>();

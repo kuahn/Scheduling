@@ -1,4 +1,4 @@
-package scheduling;
+package scheduling.gooey;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import scheduling.Scheduling;
 /**
  *
  * @author leijurv

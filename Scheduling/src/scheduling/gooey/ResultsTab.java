@@ -1,4 +1,4 @@
-package scheduling;
+package scheduling.gooey;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -9,6 +9,13 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import scheduling.Block;
+import scheduling.Room;
+import scheduling.Schedule;
+import scheduling.Scheduling;
+import scheduling.Section;
+import scheduling.Student;
+import scheduling.Teacher;
 /**
  *
  * @author leijurv

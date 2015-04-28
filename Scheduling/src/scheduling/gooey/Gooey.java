@@ -1,4 +1,4 @@
-package scheduling;
+package scheduling.gooey;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
@@ -8,7 +8,7 @@ import javax.swing.WindowConstants;
  */
 public class Gooey {
     static JTabbedPane tabs = new JTabbedPane();
-    static InfoTab infotab;
+    public static InfoTab infotab;
     static StudentsTab studentstab;
     static ResultsTab results;
     public static void setupTabs() {

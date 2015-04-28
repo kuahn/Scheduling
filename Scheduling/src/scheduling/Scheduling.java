@@ -7,6 +7,7 @@ package scheduling;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import scheduling.gooey.Gooey;
 /**
  *
  * @author leijurv
@@ -52,14 +53,14 @@ public class Scheduling {
             students.add(dragon);
         }
     }
-    static double numAt = 0;
-    static double numU = 0;
-    static long time = 0;
-    static RandomScheduler rd;
-    static int numStud = 0;
-    static ArrayList<Student> students;
-    static ArrayList<Subject> subjects;
-    static boolean running = false;
+    public static double numAt = 0;
+    public static double numU = 0;
+    public static long time = 0;
+    public static RandomScheduler rd;
+    public static int numStud = 0;
+    public static ArrayList<Student> students;
+    public static ArrayList<Subject> subjects;
+    public static boolean running = false;
     public static void main(String[] args) throws IOException {
         students = new ArrayList<>();
         subjects = new ArrayList<>();

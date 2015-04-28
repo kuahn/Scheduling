@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
  * @author leijurv
  */
 public abstract class Scheduler {
-    final ArrayList<Teacher> teachers;
-    final ArrayList<Subject> subjects;
-    final ArrayList<Klass> klasses;
-    final ArrayList<Section> sections;
-    final ArrayList<Student> students;
+    public final ArrayList<Teacher> teachers;
+    public final ArrayList<Subject> subjects;
+    public final ArrayList<Klass> klasses;
+    public final ArrayList<Section> sections;
+    public final ArrayList<Student> students;
     protected Schedule result = null;
     public Scheduler(ArrayList<Student> students, ArrayList<Subject> subjects) {
         this.subjects = subjects;

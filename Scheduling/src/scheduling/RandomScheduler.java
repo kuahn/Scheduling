@@ -18,9 +18,9 @@ public class RandomScheduler extends Scheduler {
     static final boolean PRINT_ATT = false;
     static final boolean PRINT_INIT = false;
     ArrayList<Integer> randomAssignAttempts = new ArrayList<>();
-    int allowedAttempts = 0;
-    double average = 0;
-    int max = 0;
+    public int allowedAttempts = 0;
+    public double average = 0;
+    public int max = 0;
     public int calcAttempts() {
         if (randomAssignAttempts.isEmpty()) {
             return TOTAL_ASSIGN_ATTEMPTS;

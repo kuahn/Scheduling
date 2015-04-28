@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class Subject {
     final String name;
     final ArrayList<Klass> klasses;
-    final ArrayList<Teacher> teachers;
+    public final ArrayList<Teacher> teachers;
     public Subject(String name, ArrayList<Klass> klasses, Teacher[] teachers) {
         this.teachers = new ArrayList<>(Arrays.asList(teachers));
         this.klasses = klasses;

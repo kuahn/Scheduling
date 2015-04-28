@@ -10,9 +10,9 @@ import java.util.stream.Stream;
  */
 public class Student {
     private static final HashMap<Grade, ArrayList<SubjectRequirement>> allRequiredSubjects;
-    final ArrayList<Requirement> requirements;
-    final String name;
-    final Grade grade;
+    public final ArrayList<Requirement> requirements;
+    public final String name;
+    public final Grade grade;
     static{
         allRequiredSubjects = new HashMap<>();
         for (Grade grade : Grade.values()) {

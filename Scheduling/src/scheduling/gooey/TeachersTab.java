@@ -1,4 +1,4 @@
-package scheduling;
+package scheduling.gooey;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -8,33 +8,39 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import scheduling.Scheduling;
+import scheduling.Teacher;
 /**
  *
  * @author leijurv
  */
-public class RoomsTab extends JComponent {
+public class TeachersTab extends JComponent {
     JTable table;
-    public RoomsTab() {
+    public TeachersTab() {
         //setLayout(new FlowLayout());
         TableModel dataModel = new AbstractTableModel() {
             public int getColumnCount() {
-                return 1;
+                return 2;
             }
             public int getRowCount() {
-                return Room.numRooms;
+                return Scheduling.rd.teachers.size();
             }
             public Object getValueAt(int row, int col) {
-                return Room.getRoomArray()[row];
+                Teacher s = Scheduling.rd.teachers.get(row);
+                if (col == 0) {
+                    return s.toString();
+                }
+                return s.getWorkingBlocks().toString();
             }
             public String getColumnName(int col) {
-                return new String[] {"Room"}[col];
+                return new String[] {"Name", "Works During"}[col];
             }
         };
         table = new JTable(dataModel);
         JScrollPane kush = new JScrollPane(table);
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        JButton button = new JButton("Add Room");
+        JButton button = new JButton("Add Teacher");
         c.gridx = 0;
         c.anchor = GridBagConstraints.CENTER;
         add(button, c);

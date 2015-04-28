@@ -1,44 +1,47 @@
-package scheduling;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+package scheduling.gooey;
+import java.awt.*;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import scheduling.Scheduling;
+import scheduling.Student;
 /**
  *
  * @author leijurv
  */
-public class TeachersTab extends JComponent {
+public class StudentsTab extends JComponent {
     JTable table;
-    public TeachersTab() {
+    public StudentsTab() {
         //setLayout(new FlowLayout());
         TableModel dataModel = new AbstractTableModel() {
             public int getColumnCount() {
                 return 2;
             }
             public int getRowCount() {
-                return Scheduling.rd.teachers.size();
+                return Scheduling.rd.students.size();
             }
             public Object getValueAt(int row, int col) {
-                Teacher s = Scheduling.rd.teachers.get(row);
+                Student s = Scheduling.rd.students.get(row);
                 if (col == 0) {
                     return s.toString();
                 }
-                return s.getWorkingBlocks().toString();
+                return s.grade.toString();
             }
             public String getColumnName(int col) {
-                return new String[] {"Name", "Works During"}[col];
+                return new String[] {"Name", "Grade"}[col];
+            }
+            public boolean isCellEditable(int row, int col) {
+                return true;
             }
         };
         table = new JTable(dataModel);
         JScrollPane kush = new JScrollPane(table);
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        JButton button = new JButton("Add Teacher");
+        JButton button = new JButton("Add Student");
         c.gridx = 0;
         c.anchor = GridBagConstraints.CENTER;
         add(button, c);
