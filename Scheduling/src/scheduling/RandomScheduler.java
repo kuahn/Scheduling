@@ -17,6 +17,7 @@ public class RandomScheduler extends Scheduler {
     static final boolean PRINT_UNF = false;
     static final boolean PRINT_ATT = false;
     static final boolean PRINT_INIT = false;
+    static final boolean PRINT_INIT_TIME = false;
     ArrayList<Integer> randomAssignAttempts = new ArrayList<>();
     public int allowedAttempts = 0;
     public double average = 0;
@@ -45,12 +46,17 @@ public class RandomScheduler extends Scheduler {
         }
         int numAttempts = 0;
         allowedAttempts = calcAttempts();
+        long time = System.currentTimeMillis();
         while (assignRandomBlocksAndTeachers() < 0 && numAttempts < allowedAttempts) {
             numAttempts++;
         }
+        long after = System.currentTimeMillis();
         randomAssignAttempts.add(numAttempts);
         if (numAttempts > max) {
             max = numAttempts;
+        }
+        if (PRINT_INIT_TIME) {
+            System.out.println("Inital took" + (after - time) + "ms");
         }
         if (numAttempts >= allowedAttempts) {
             throw new IllegalStateException("I");
@@ -91,18 +97,24 @@ public class RandomScheduler extends Scheduler {
         System.out.println("Schedules for students: " + temp.getStudentSchedules());
         System.out.println(temp.roster);
         result = temp;
+        result.findConflicts();
+        Random r = new Random();
+        for (Section section : sections) {
+            if (r.nextInt(5) == 0) {
+                result.timings.put(section, Block.blocks[0]);
+            }
+            if (r.nextInt(5) == 0) {
+                result.timings.put(section, Block.blocks[1]);
+            }
+            //result.locations.put(section, Room.getRoomArray()[0]);
+        }
     }
     private void printSched() {
         for (Section section : sections) {
             System.out.println(section + " at " + temp.timings.get(section) + " taught by " + temp.teachers.get(section) + " in " + temp.locations.get(section));
         }
         System.out.println("Schedules for teachers: " + temp.getTeacherSchedules());
-        try {
-            System.out.println("sshedules for rooms: " + temp.getRoomSchedules());
-        } catch (IllegalStateException e) {
-            System.out.println("OUT OF ROOMS");
-            System.exit(0);
-        }
+        System.out.println("sshedules for rooms: " + temp.getRoomSchedules());
     }
     public int assignStudent(Student student) {
         Random r = new Random();

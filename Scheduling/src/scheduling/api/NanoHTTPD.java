@@ -113,6 +113,9 @@ public class NanoHTTPD {
         if (uri.startsWith("getinfo/")) {
             return getinfo(uri.substring(8, uri.length()), header);
         }
+        if (uri.startsWith("conflicts")) {
+            return new Response(HTTP_OK, Scheduling.getSchedule().findConflicts());
+        }
         return new Response(HTTP_FORBIDDEN, "not dank");
     }
     public Response getinfo(String uri, Properties header) {

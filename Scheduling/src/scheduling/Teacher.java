@@ -1,6 +1,8 @@
 package scheduling;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 /**
  *
  * @author leijurv
@@ -80,7 +82,7 @@ public class Teacher {
         return name;
     }
     public String getinfo(Schedule s) {//used for api
-        Map<Block, Section> schedule = s.getTeacherSchedule(this);
+        Map<Block, List<Section>> schedule = s.getTeacherSchedule(this);
         StringBuilder resp = new StringBuilder();
         resp.append("{\n");
         aq(resp, "firstname");
@@ -131,8 +133,9 @@ public class Teacher {
         for (Block b : Block.blocks) {
             aq(resp, b.toString());
             resp.append(':');
-            Section location = schedule.get(b);
-            aq(resp, location == null ? "Free" : location.toString());
+            List<Section> location = schedule.get(b);
+            List<String> res = location.parallelStream().map(section->'"' + section.toString() + '"').collect(Collectors.toList());
+            resp.append(res.toString());
             resp.append(",\n");
         }
         resp.append("}}");
