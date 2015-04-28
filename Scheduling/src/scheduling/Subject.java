@@ -26,6 +26,9 @@ public class Subject {
         for (int i = 0; i < numKlasses; i++) {
             klasses.add(new Klass(klassNames[i], sectionNumbers[i], maxClassSize));
         }
+        this.teachers.parallelStream().forEach((t)->{
+            t.subjectsTeached.add(this);
+        });
         registerKlasses();
     }
     public final void registerKlasses() {

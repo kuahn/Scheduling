@@ -55,7 +55,7 @@ public class RandomScheduler extends Scheduler {
         if (numAttempts >= allowedAttempts) {
             throw new IllegalStateException("I");
         }
-        if (!temp.verifyRoomsTeachers(teachers)) {
+        if (!temp.verifyRoomsTeachers()) {
             throw new ArrayIndexOutOfBoundsException("jankydank. verification for first step failed. you broke something");
         }
         //System.out.println("Successfully randomly assigned sections to teachers and blocks after " + numAttempts + " attempts");
@@ -96,7 +96,7 @@ public class RandomScheduler extends Scheduler {
         for (Section section : sections) {
             System.out.println(section + " at " + temp.timings.get(section) + " taught by " + temp.teachers.get(section) + " in " + temp.locations.get(section));
         }
-        System.out.println("Schedules for teachers: " + temp.getTeacherSchedules(teachers));
+        System.out.println("Schedules for teachers: " + temp.getTeacherSchedules());
         try {
             System.out.println("sshedules for rooms: " + temp.getRoomSchedules());
         } catch (IllegalStateException e) {

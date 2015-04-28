@@ -1,23 +1,38 @@
 package scheduling;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Map;
 /**
  *
  * @author leijurv
  */
 public class Teacher {
     final String name;
+    final String firstName;
+    final String lastName;
+    public final String nuevaUsername;
     private final boolean[] workingBlocks = new boolean[Block.numBlocks];
     private final ArrayList<Block> workBlocks;
-    ArrayList<Subject> subjectsTeached;
-    ArrayList<Klass> klassesTeached;
+    final ArrayList<Subject> subjectsTeached;
+    final ArrayList<Klass> klassesTeached;
     public Teacher(String name) {
         this.name = name;
+        int l = name.indexOf(' ');
+        if (l != -1) {
+            firstName = name.substring(0, l);
+            lastName = name.substring(l + 1, name.length());
+        } else {
+            firstName = name;
+            lastName = "";
+        }
+        String cut = lastName.split(" ")[0];//elllie van der rijn goes to elivan not elivand
+        nuevaUsername = (firstName.charAt(0) + cut).toLowerCase();
         workBlocks = new ArrayList<>(Block.numBlocks);//ensure capacity
         for (int i = workingBlocks.length - 1; i >= 0; i--) {
             workingBlocks[i] = true;
             workBlocks.add(Block.blocks[i]);
         }
+        subjectsTeached = new ArrayList<>();
+        klassesTeached = new ArrayList<>();
     }
     public Teacher(String name, ArrayList<Block> doesNotWork) {
         this(name);
@@ -63,5 +78,70 @@ public class Teacher {
     @Override
     public String toString() {
         return name;
+    }
+    public String getinfo(Schedule s) {//used for api
+        Map<Block, Section> schedule = s.getTeacherSchedule(this);
+        StringBuilder resp = new StringBuilder();
+        resp.append("{\n");
+        aq(resp, "firstname");
+        resp.append(':');
+        aq(resp, firstName);
+        resp.append(',');
+        resp.append('\n');
+        aq(resp, "lastname");
+        resp.append(':');
+        aq(resp, lastName);
+        resp.append(',');
+        resp.append('\n');
+        aq(resp, "username");
+        resp.append(':');
+        aq(resp, nuevaUsername);
+        resp.append(',');
+        resp.append('\n');
+        aq(resp, "worksDuring");
+        resp.append(":{\n");
+        for (Block b : Block.blocks) {
+            aq(resp, b.toString());
+            resp.append(':');
+            resp.append(worksDuringBlock(b));
+            resp.append(",\n");
+        }
+        resp.append("},");
+        resp.append('\n');
+        aq(resp, "klassesTought");
+        resp.append(":[");
+        for (int i = 0; i < klassesTeached.size(); i++) {
+            aq(resp, klassesTeached.get(i) + "");
+            if (i != klassesTeached.size() - 1) {
+                resp.append(',');
+            }
+        }
+        resp.append("],\n");
+        aq(resp, "subjectsTought");
+        resp.append(":[");
+        for (int i = 0; i < subjectsTeached.size(); i++) {
+            aq(resp, subjectsTeached.get(i) + "");
+            if (i != subjectsTeached.size() - 1) {
+                resp.append(',');
+            }
+        }
+        resp.append("],\n");
+        aq(resp, "schedule");
+        resp.append(":{\n");
+        for (Block b : Block.blocks) {
+            aq(resp, b.toString());
+            resp.append(':');
+            Section location = schedule.get(b);
+            aq(resp, location == null ? "Free" : location.toString());
+            resp.append(",\n");
+        }
+        resp.append("}}");
+        return resp.toString();
+    }
+    public static void aq(StringBuilder r, String s) {//append something within quotes, helper for JSON creation
+        // TODO use that JSON library to make JSON
+        r.append("\"");
+        r.append(s);
+        r.append("\"");
     }
 }

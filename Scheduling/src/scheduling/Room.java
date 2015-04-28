@@ -1,5 +1,6 @@
 package scheduling;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 /**
  *
@@ -40,5 +41,32 @@ public class Room {
     @Override
     public String toString() {
         return "Room " + roomNumber;
+    }
+    public String getinfo(Schedule s) {//used for api
+        Map<Block, Section> schedule = s.getRoomSchedule(this);
+        StringBuilder resp = new StringBuilder();
+        resp.append("{\n");
+        aq(resp, "roomNumber");
+        resp.append(':');
+        resp.append(roomNumber);
+        resp.append(',');
+        resp.append('\n');
+        aq(resp, "schedule");
+        resp.append(":{\n");
+        for (Block b : Block.blocks) {
+            aq(resp, b.toString());
+            resp.append(':');
+            Section location = schedule.get(b);
+            aq(resp, location == null ? "Free" : location.toString());
+            resp.append(",\n");
+        }
+        resp.append("}}");
+        return resp.toString();
+    }
+    public static void aq(StringBuilder r, String s) {//append something within quotes, helper for JSON creation
+        // TODO use that JSON library to make JSON
+        r.append("\"");
+        r.append(s);
+        r.append("\"");
     }
 }

@@ -17,6 +17,7 @@ public class Schedule {
     public final ArrayList<Section> sections;
     public final ArrayList<Student> students;
     public final Roster roster;
+    public final ArrayList<Teacher> teacherList;
     public Schedule(ArrayList<Section> sections, ArrayList<Student> students) {
         locations = new HashMap<>();
         timings = new HashMap<>();
@@ -24,17 +25,20 @@ public class Schedule {
         this.sections = sections;
         this.students = students;
         this.roster = new Roster(students, sections);
+        teacherList = new ArrayList<>(sections.stream().flatMap(section->section.klass.teachers.stream()).distinct().collect(Collectors.toList()));
     }
-    public boolean verifyRoomsTeachers(ArrayList<Teacher> teacherz) {
+    public boolean verifyRoomsTeachers() {
         for (Block block : Block.blocks) {
             if (!Room.getRooms().parallelStream().noneMatch((room)->(getRoomUsage(room, block).size() > 1))) {
                 return false;
             }
-            if (!teacherz.parallelStream().noneMatch((t)->(getTeacherLocation(t, block).size() > 1))) {
+            if (!teacherList.parallelStream().noneMatch((t)->(getTeacherLocation(t, block).size() > 1))) {
                 return false;
             }
         }
         return true;
+    }
+    public void findConflicts() {
     }
     public List<Section> getTeacherLocation(Teacher teacher, Block time) {//well, the teacher SHOULD only be in one place...
         //this can be parallel because hashmaps are thread safe if the only operations happening are read only
@@ -66,8 +70,8 @@ public class Schedule {
     public Map<Block, Section> getStudentSchedule(Student student) {
         return roster.getSections(student).parallelStream().collect(Collectors.toMap(section->timings.get(section), section->section));
     }
-    public Map<Teacher, Map<Block, Section>> getTeacherSchedules(List<Teacher> teacherz) {
-        return teacherz.parallelStream().collect(Collectors.toMap(teacher->teacher, teacher->getTeacherSchedule(teacher)));
+    public Map<Teacher, Map<Block, Section>> getTeacherSchedules() {
+        return teacherList.parallelStream().collect(Collectors.toMap(teacher->teacher, teacher->getTeacherSchedule(teacher)));
     }
     public Map<Student, Map<Block, Section>> getStudentSchedules() {
         return students.parallelStream().collect(Collectors.toMap(student->student, student->getStudentSchedule(student)));
@@ -77,7 +81,7 @@ public class Schedule {
     }
     public static void output(Scheduler rd) throws IOException {
         Schedule schedule = rd.getResult();
-        Map<Teacher, Map<Block, Section>> teacherSchedules = schedule.getTeacherSchedules(rd.teachers);
+        Map<Teacher, Map<Block, Section>> teacherSchedules = schedule.getTeacherSchedules();
         Map<Room, Map<Block, Section>> roomSchedules = schedule.getRoomSchedules();
         Map<Student, Map<Block, Section>> studentSchedules = schedule.getStudentSchedules();
         String basePath = System.getProperty("user.home") + "/Documents/schedout/";

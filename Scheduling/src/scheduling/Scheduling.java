@@ -7,6 +7,7 @@ package scheduling;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import scheduling.api.NanoHTTPD;
 import scheduling.gooey.Gooey;
 /**
  *
@@ -42,14 +43,14 @@ public class Scheduling {
     public static void createSubjects(Grade grade, ArrayList<Subject> subjects, ArrayList<Student> students) {
         String[] subjectn = new String[] {grade + "Math", grade + "History", grade + "English", grade + "Science"};
         for (int i = 0; i < subjectn.length; i++) {
-            Teacher a = new Teacher("Teech" + (ti++));
-            Teacher b = new Teacher("Teech" + (ti++));
+            Teacher a = new Teacher("Teech " + (ti++));
+            Teacher b = new Teacher("Teech " + (ti++));
             Subject dank = new Subject(subjectn[i], new String[] {"ClassOne", "ClassTwo"}, new int[] {3, 3}, new Teacher[] {a, b}, 19);
             Student.addRequiredSubject(grade, dank);
             subjects.add(dank);
         }
         for (int i = 0; i < 100; i++) {
-            Student dragon = new Student(grade + "student" + i, grade);
+            Student dragon = new Student(grade + "student s" + i, grade);
             students.add(dragon);
         }
     }
@@ -61,7 +62,7 @@ public class Scheduling {
     public static ArrayList<Student> students;
     public static ArrayList<Subject> subjects;
     public static boolean running = false;
-    public static void main(String[] args) throws IOException {
+    public static void main2(String[] args) throws IOException {
         students = new ArrayList<>();
         subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++))};
@@ -73,10 +74,16 @@ public class Scheduling {
         createSubjects(Grade.GRADE10, subjects, students);
         createSubjects(Grade.GRADE11, subjects, students);
         createSubjects(Grade.GRADE12, subjects, students);
+        students.add(new Student("Leif Jurvetson", Grade.GRADE9));
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
         Gooey.setup();
         //System.exit(0);
+    }
+    public static void main(String[] args) throws IOException {
+        NanoHTTPD.init();
+        main2(args);
+        System.in.read();
     }
     public static void start() {
         if (rd.isFinished() || running) {
@@ -113,5 +120,8 @@ public class Scheduling {
             }
         }
         running = false;
+    }
+    public static Schedule getSchedule() {
+        return rd.getResult();
     }
 }
