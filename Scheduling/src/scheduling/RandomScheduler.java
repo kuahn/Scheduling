@@ -100,10 +100,10 @@ public class RandomScheduler extends Scheduler {
         result.findConflicts();
         Random r = new Random();
         for (Section section : sections) {
-            if (r.nextInt(5) == 0) {
+            if (r.nextInt(3) == 0) {
                 result.timings.put(section, Block.blocks[0]);
             }
-            if (r.nextInt(5) == 0) {
+            if (r.nextInt(3) == 0) {
                 result.timings.put(section, Block.blocks[1]);
             }
             //result.locations.put(section, Room.getRoomArray()[0]);
@@ -139,7 +139,7 @@ public class RandomScheduler extends Scheduler {
         }
         return numUn;
     }
-    public boolean canJoinClass(Student student, Section section) {// TODO implement maximum class size
+    public boolean canJoinClass(Student student, Section section) {
         if (!section.canFitAnotherStudent(temp.roster.numStudents(section))) {
             return false;
         }

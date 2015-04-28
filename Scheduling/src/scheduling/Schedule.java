@@ -47,28 +47,25 @@ public class Schedule {
         }
     }
     public String findConflicts() {
-        Stream<Tuple<Room, List<String>>> roomConf
-                = Room.getRooms().parallelStream().map(room->new Tuple<Room, List<String>>(room,
-                                Stream.of(Block.blocks).parallel().map(
-                                        block->new Tuple<Block, List<Section>>(
-                                                block,
-                                                sections.parallelStream().filter(section->room.equals(locations.get(section))
-                                                        && block.equals(timings.get(section))).collect(Collectors.toList())
-                                        )
-                                ).filter(tuple->tuple.b.size() > 1).
-                                map(tuple->"\"In room " + room + " during " + tuple.a + ", there are classes " + tuple.b + "\"").
-                                collect(Collectors.toList()))
-                ).filter(tuple->!tuple.b.isEmpty());
-        Stream<Tuple<Teacher, List<String>>> teacherConf = teacherList.parallelStream().map(teacher->new Tuple<Teacher, List<String>>(teacher,
+        String roomConflicts = Room.getRooms().parallelStream().map(room->new Tuple<Room, List<String>>(room,
+                Stream.of(Block.blocks).parallel().map(
+                        block->new Tuple<Block, List<Section>>(
+                                block,
+                                sections.parallelStream().filter(section->room.equals(locations.get(section))
+                                        && block.equals(timings.get(section))).collect(Collectors.toList())
+                        )
+                ).filter(tuple->tuple.b.size() > 1).
+                map(tuple->"\"In room " + room + " during " + tuple.a + ", there are classes " + tuple.b + "\"").
+                collect(Collectors.toList()))
+        ).filter(tuple->!tuple.b.isEmpty()).map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
+        String teacherConflicts = teacherList.parallelStream().map(teacher->new Tuple<Teacher, List<String>>(teacher,
                 Stream.of(Block.blocks).parallel().map(
                         block->new Tuple<Block, List<Section>>(
                                 block,
                                 sections.parallelStream().filter(section->teacher.equals(teachers.get(section)) && block.equals(timings.get(section))).collect(Collectors.toList())
                         )
                 ).filter(tuple->tuple.b.size() > 1).map(tuple->"\"Teacher " + teacher + " during " + tuple.a + " is teaching classes " + tuple.b + "\"").collect(Collectors.toList()))
-        ).filter(tuple->!tuple.b.isEmpty());
-        String roomConflicts = roomConf.map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
-        String teacherConflicts = teacherConf.map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
+        ).filter(tuple->!tuple.b.isEmpty()).map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
         //System.out.println(roomConflicts);
         //System.out.println(teacherConflicts);
         return "{room:" + roomConflicts + ",\nteacher:" + teacherConflicts + "}";
