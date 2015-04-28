@@ -4,6 +4,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.stream.Collectors;
 import scheduling.*;
 /**
  * A simple, tiny, nicely embeddable HTTP 1.0 (partially 1.1) server in Java
@@ -102,7 +103,7 @@ public class NanoHTTPD {
     }
     public Response call(String uri, Properties header) {
         System.out.println("#LOL SERVING" + uri);
-        if (uri.startsWith("/api/")) {
+        if (uri.startsWith("/api")) {
             return api(uri.substring(5, uri.length()), header);
         }
         return serveFile(uri, header, new File(System.getProperty("user.home")), true);
@@ -116,7 +117,22 @@ public class NanoHTTPD {
         if (uri.startsWith("conflicts")) {
             return new Response(HTTP_OK, Scheduling.getSchedule().findConflicts());
         }
-        return new Response(HTTP_FORBIDDEN, "not dank");
+        if (uri.startsWith("list/")) {
+            return list(uri.substring(5, uri.length()), header);
+        }
+        return new Response(HTTP_FORBIDDEN, "lol your options are getinfo, conflicts, or list");
+    }
+    public Response list(String uri, Properties header) {
+        if (uri.equals("students")) {
+            return new Response(HTTP_OK, "{students:" + Scheduling.students.parallelStream().map(student->"\"" + student.nuevaUsername + "\"").collect(Collectors.toList()) + "}");
+        }
+        if (uri.equals("rooms")) {
+            return new Response(HTTP_OK, "{rooms:" + Room.getRooms().parallelStream().map(room->room.toString()).map(room->room.substring(5, room.length())).collect(Collectors.toList()) + "}");
+        }
+        if (uri.equals("teachers")) {
+            return new Response(HTTP_OK, "{teachers:" + Scheduling.rd.teachers.parallelStream().map(teacher->"\"" + teacher.nuevaUsername + "\"").collect(Collectors.toList()) + "}");
+        }
+        return new Response(HTTP_FORBIDDEN, "lol your options are students, rooms, or teachers");
     }
     public Response getinfo(String uri, Properties header) {
         if (uri.startsWith("room/")) {
@@ -128,7 +144,7 @@ public class NanoHTTPD {
         if (uri.startsWith("teacher/")) {
             return getTeacherSchedule(uri.substring(8, uri.length()), header);
         }
-        return new Response(HTTP_FORBIDDEN, "not dank1");
+        return new Response(HTTP_FORBIDDEN, "lol your options are room, student, or teacher");
     }
     public Response getTeacherSchedule(String uri, Properties header) {
         ArrayList<Teacher> teachers = Scheduling.rd.teachers;
