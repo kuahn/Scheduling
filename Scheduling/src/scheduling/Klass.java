@@ -11,8 +11,8 @@ public class Klass {
     final int numSections;
     final Section[] sections;
     final ArrayList<Teacher> teachers;
-    final Room[] acceptableRooms;
-    public Klass(String name, int numSections, Teacher[] customTeachers, Room[] acceptableRooms) {
+    ArrayList<Room> acceptableRooms;
+    public Klass(String name, int numSections, Teacher[] customTeachers, ArrayList<Room> acceptableRooms) {
         this.name = name;
         this.numSections = numSections;
         sections = new Section[numSections];
@@ -20,10 +20,10 @@ public class Klass {
             sections[i] = new Section(this, i);
         }
         teachers = new ArrayList<>(Arrays.asList(customTeachers));
-        this.acceptableRooms = acceptableRooms;
+        this.acceptableRooms = new ArrayList<>(acceptableRooms);
     }
     public Klass(String name, int numSections, Teacher[] customTeachers) {
-        this(name, numSections, customTeachers, Room.getRoomArray());
+        this(name, numSections, customTeachers, Room.getRooms());
     }
     public Klass(String name, int numSections) {
         this(name, numSections, new Teacher[] {});
@@ -40,6 +40,16 @@ public class Klass {
     }
     public Subject getSubject() {
         return subject;
+    }
+    public void setAcceptableRoom(Room room) {
+        resetAcceptableRooms();
+        addAcceptableRoom(room);
+    }
+    public void addAcceptableRoom(Room room) {
+        acceptableRooms.add(room);
+    }
+    public void resetAcceptableRooms() {
+        acceptableRooms = new ArrayList<>();
     }
     @Override
     public String toString() {

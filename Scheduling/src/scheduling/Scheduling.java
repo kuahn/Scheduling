@@ -7,6 +7,7 @@ package scheduling;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 import scheduling.api.NanoHTTPD;
 import scheduling.gooey.Gooey;
 /**
@@ -41,10 +42,13 @@ public class Scheduling {
     static Subject language;
     static int ti = 0;
     public static void createSubjects(Grade grade, ArrayList<Subject> subjects, ArrayList<Student> students) {
+        Random r = new Random();
         String[] subjectn = new String[] {grade + "Math", grade + "History", grade + "English", grade + "Science"};
         for (int i = 0; i < subjectn.length; i++) {
             Teacher a = new Teacher("Teech " + (ti++));
             Teacher b = new Teacher("Teech " + (ti++));
+            a.setDoesWork(r.nextInt(7), false);
+            b.setDoesWork(r.nextInt(7), false);
             Subject dank = new Subject(subjectn[i], new String[] {"ClassOne", "ClassTwo"}, new int[] {3, 3}, new Teacher[] {a, b});
             Student.addRequiredSubject(grade, dank);
             subjects.add(dank);

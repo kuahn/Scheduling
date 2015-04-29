@@ -1,6 +1,7 @@
 package scheduling;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 /**
  *
  * @author leijurv
@@ -23,13 +24,21 @@ public class Subject {
         this.name = name;
         int numKlasses = klassNames.length;
         klasses = new ArrayList<>(numKlasses);
+        Random r = new Random();
+        int nr = Room.numRooms;
         for (int i = 0; i < numKlasses; i++) {
-            klasses.add(new Klass(klassNames[i], sectionNumbers[i]));
+            Klass klass = new Klass(klassNames[i], sectionNumbers[i]);
+            klass.resetAcceptableRooms();
+            for (int j = 0; j < 5; j++) {
+                klass.addAcceptableRoom(Room.getRoomArray()[r.nextInt(nr)]);
+            }
+            klasses.add(klass);
+            klass.registerSubject(this);
+            System.out.println("Klass " + klass + " has rooms " + klass.acceptableRooms);
         }
         this.teachers.parallelStream().forEach((t)->{
             t.subjectsTeached.add(this);
         });
-        registerKlasses();
     }
     public final void registerKlasses() {
         klasses.stream().parallel().forEach((klass)->{//This is thread safe because ArrayList.contains is thread safe
