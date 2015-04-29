@@ -67,11 +67,17 @@ public class Schedule {
                         )
                 ).filter(tuple->tuple.b.size() > 1).map(tuple->"\"Teacher " + teacher + " during " + tuple.a + " is teaching classes " + tuple.b + "\"").collect(Collectors.toList()))
         ).filter(tuple->!tuple.b.isEmpty());
-        String roomConflicts = roomConf.map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
-        String teacherConflicts = teacherConf.map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
+        String roomConflicts = roomConf.map(tuple->"\n\"" + tuple.a + "\":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
+        String teacherConflicts = teacherConf.map(tuple->"\n\"" + tuple.a + "\":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
+        Stream<Tuple<Student, List<String>>> studentConf = students.stream().map(student->{
+            Map<Block, List<Section>> map = roster.getSections(student).stream().collect(Collectors.groupingBy(section->timings.get(section)));
+            List<String> conf = Stream.of(Block.blocks).map(block->new Tuple<Block, List<Section>>(block, map.get(block))).filter(tuple->tuple.b != null && tuple.b.size() > 1).map(tuple->"\"Student " + student + " during " + tuple.a + " is in classes " + tuple.b + "\"").collect(Collectors.toList());
+            return new Tuple<Student, List<String>>(student, conf);
+        }).filter(tuple->!tuple.b.isEmpty());
+        String studentConflicts = studentConf.map(tuple->"\n\"" + tuple.a + "\":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
         //System.out.println(roomConflicts);
         //System.out.println(teacherConflicts);
-        return "{room:" + roomConflicts + ",\nteacher:" + teacherConflicts + "}";
+        return "{room:" + roomConflicts + ",\nteacher:" + teacherConflicts + ",\nstudent:" + studentConflicts + "}";
         /*
          Map<Room, Map<Block, List<Section>>> loc1
          = Room.getRooms().parallelStream().collect(Collectors.toMap(room->room,
@@ -89,7 +95,10 @@ public class Schedule {
         return sections.parallelStream().filter(section->time.equals(timings.get(section)) && room.equals(locations.get(section))).collect(Collectors.toList());
     }
     public Stream<Section> getStudentSectionStream(Student student, Block time) {//well, the student SHOULD only be in one section at once..
-        return roster.getSections(student).parallelStream().filter(section->time.equals(timings.get(section)));
+        return roster.getSections(student).stream().filter(section->time.equals(timings.get(section)));
+    }
+    public boolean studentIsInClass(Student student, Block time) {
+        return roster.getSections(student).stream().anyMatch(section->time.equals(timings.get(section)));
     }
     public List<Section> getStudentSection(Student student, Block time) {
         return getStudentSectionStream(student, time).collect(Collectors.toList());

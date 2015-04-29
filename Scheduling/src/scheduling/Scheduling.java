@@ -27,8 +27,8 @@ public class Scheduling {
         Teacher donkey = new Teacher("Donkey");
         donkey.setDoesWork(0, false);
         donkey.setDoesWork(2, false);
-        Subject math = new Subject("Math", new String[] {"Algebra", "Geometry (dash)", "Cat math"}, new int[] {2, 2, 1}, new Teacher[] {shrek, donkey}, 20);
-        Subject history = new Subject("History", new String[] {"Swamp history"}, new int[] {2}, new Teacher[] {shrek}, 20);
+        Subject math = new Subject("Math", new String[] {"Algebra", "Geometry (dash)", "Cat math"}, new int[] {2, 2, 1}, new Teacher[] {shrek, donkey});
+        Subject history = new Subject("History", new String[] {"Swamp history"}, new int[] {2}, new Teacher[] {shrek});
         Student.addRequiredSubject(Grade.GRADE9, math);
         Student.addRequiredSubject(Grade.GRADE9, history);
         Student dragon = new Student("Dragon", Grade.GRADE9, new Klass[] {math.klasses.get(0)});
@@ -45,7 +45,7 @@ public class Scheduling {
         for (int i = 0; i < subjectn.length; i++) {
             Teacher a = new Teacher("Teech " + (ti++));
             Teacher b = new Teacher("Teech " + (ti++));
-            Subject dank = new Subject(subjectn[i], new String[] {"ClassOne", "ClassTwo"}, new int[] {3, 3}, new Teacher[] {a, b}, 19);
+            Subject dank = new Subject(subjectn[i], new String[] {"ClassOne", "ClassTwo"}, new int[] {3, 3}, new Teacher[] {a, b});
             Student.addRequiredSubject(grade, dank);
             subjects.add(dank);
         }
@@ -66,7 +66,7 @@ public class Scheduling {
         students = new ArrayList<>();
         subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++))};
-        language = new Subject("Language", new String[] {"Spanish 1", "Spanish 2", "Japanese 1", "Japanese 2", "Mandarin 1", "Mandarin 2"}, new int[] {2, 2, 2, 2, 2, 2}, langTeach, 18);
+        language = new Subject("Language", new String[] {"Spanish 1", "Spanish 2", "Japanese 1", "Japanese 2", "Mandarin 1", "Mandarin 2"}, new int[] {2, 2, 2, 2, 2, 2}, langTeach);
         subjects.add(language);
         Student.addRequiredSubject(Grade.GRADE9, language);
         Student.addRequiredSubject(Grade.GRADE10, language);

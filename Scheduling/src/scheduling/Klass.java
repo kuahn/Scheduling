@@ -12,24 +12,21 @@ public class Klass {
     final Section[] sections;
     final ArrayList<Teacher> teachers;
     final Room[] acceptableRooms;
-    public Klass(String name, int numSections, Teacher[] customTeachers, Room[] acceptableRooms, int maxSize) {
+    public Klass(String name, int numSections, Teacher[] customTeachers, Room[] acceptableRooms) {
         this.name = name;
         this.numSections = numSections;
         sections = new Section[numSections];
         for (int i = 0; i < numSections; i++) {
-            sections[i] = new Section(this, i, maxSize);
+            sections[i] = new Section(this, i);
         }
         teachers = new ArrayList<>(Arrays.asList(customTeachers));
         this.acceptableRooms = acceptableRooms;
     }
-    public Klass(String name, int numSections, Teacher[] customTeachers, int maxSize) {
-        this(name, numSections, customTeachers, Room.getRoomArray(), maxSize);
-    }
-    public Klass(String name, int numSections, int maxSize) {
-        this(name, numSections, new Teacher[] {}, maxSize);
+    public Klass(String name, int numSections, Teacher[] customTeachers) {
+        this(name, numSections, customTeachers, Room.getRoomArray());
     }
     public Klass(String name, int numSections) {
-        this(name, numSections, new Teacher[] {}, Section.MAX_CLASS_SIZE);
+        this(name, numSections, new Teacher[] {});
     }
     public void registerSubject(Subject s) {
         if (subject != null) {

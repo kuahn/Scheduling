@@ -15,7 +15,7 @@ public class Subject {
         this.name = name;
         registerKlasses();
     }
-    public Subject(String name, String[] klassNames, int[] sectionNumbers, Teacher[] teachers, int maxClassSize) {
+    public Subject(String name, String[] klassNames, int[] sectionNumbers, Teacher[] teachers) {
         this.teachers = new ArrayList<>(Arrays.asList(teachers));
         if (klassNames.length != sectionNumbers.length) {
             throw new IllegalArgumentException("Different numbers of klassNames and sectionNumbers");
@@ -24,7 +24,7 @@ public class Subject {
         int numKlasses = klassNames.length;
         klasses = new ArrayList<>(numKlasses);
         for (int i = 0; i < numKlasses; i++) {
-            klasses.add(new Klass(klassNames[i], sectionNumbers[i], maxClassSize));
+            klasses.add(new Klass(klassNames[i], sectionNumbers[i]));
         }
         this.teachers.parallelStream().forEach((t)->{
             t.subjectsTeached.add(this);

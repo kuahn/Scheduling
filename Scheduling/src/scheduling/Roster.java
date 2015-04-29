@@ -86,7 +86,10 @@ public class Roster {
 
              but this is more OO (and quite possibly faster?)
              */
-            String s = sections.parallelStream().map(section->section + " class list: " + roster.get(section)).collect(Collectors.joining("\n", "Class lists:\n", "\n"));
+            String s = sections.parallelStream().map(section->{
+                List<Student> students = roster.get(section);
+                return section + " class list (" + students.size() + " students): " + students;
+            }).collect(Collectors.joining("\n", "Class lists:\n", "\n"));
             return s;
         }
     }
