@@ -123,7 +123,7 @@ public class RandomScheduler extends Scheduler {
         List<Requirement> requirements = student.getRequirements();
         int numUn = 0;
         for (Requirement requirement : requirements) {//This cannot be done in a parallel stream because canJoinClass depends on previous class joining
-            Optional<Section> toJoin = requirement.getSectionOptionStream().parallel().filter(section->canJoinClass(student, section)).sorted(Comparator.comparingInt(section->temp.roster.numStudents(section))).findFirst();
+            Optional<Section> toJoin = requirement.getSectionOptionStream().parallel().filter(section->canJoinClass(student, section, temp)).sorted(getSectionComparator(student, temp)).findFirst();
             if (!toJoin.isPresent()) {
                 if (PRINT_UNF) {
                     System.out.println("Unable to fufill requirement " + requirement + " for student " + student);
@@ -139,12 +139,28 @@ public class RandomScheduler extends Scheduler {
         }
         return numUn;
     }
-    public boolean canJoinClass(Student student, Section section) {
-        Block sectionTime = temp.timings.get(section);
+    static double genderBias = 0.3;//how much it will try to put even numbers of each gender in each class.
+//1: ignore class size, only minimize gender gap, 0: ignore gender gap, only equalize class sizes
+    //maybe a slider on the frontend for this?
+    public static Comparator<Section> getSectionComparator(Student toAdd, Schedule schedule) {
+        boolean isMale = toAdd.gender == Gender.MAIL;
+        return Comparator.comparingDouble(section->{
+            int numMale = schedule.roster.numMale(section);
+            int numStudents = schedule.roster.numStudents(section);
+            int numSameGender = isMale ? numMale : numStudents - numMale;
+            int numDiffGender = numStudents - numSameGender;
+            double genderScore = numSameGender - numDiffGender;
+            return genderScore * genderBias + numStudents * (1 - genderBias);
+        });
+    }
+    public static boolean canJoinClass(Student student, Section section, Schedule schedule) {
+        //ONLY for can the student PHYSICALLY join the class
+        //other things like class size and
+        Block sectionTime = schedule.timings.get(section);
         if (sectionTime == null) {
             throw new IllegalArgumentException("must assign section times before class list");
         }
-        return !temp.studentIsInClass(student, sectionTime);//if the student is nowhere else during then that block
+        return !schedule.studentIsInClass(student, sectionTime);//if the student is nowhere else during then that block
     }
     public int assignRandomBlocksAndTeachers() {
         Random rand = new Random();

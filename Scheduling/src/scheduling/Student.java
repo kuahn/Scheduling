@@ -14,6 +14,7 @@ public class Student {
     public final String lastName;//if the name is ellie van der rine, the lastname would be "van der rine" and the firstname would be "ellie"
     public final String nuevaUsername;
     public final Grade grade;
+    public final Gender gender;
     static{
         allRequiredSubjects = new HashMap<>();
         for (Grade grade : Grade.values()) {
@@ -26,7 +27,7 @@ public class Student {
     public static void addRequiredSubject(Subject subject, Grade grade) {//in case you get the argument order wrong =)
         addRequiredSubject(grade, subject);
     }
-    public Student(String name, Grade grade, ArrayList<Klass> requiredClasses) {
+    public Student(String name, Grade grade, ArrayList<Klass> requiredClasses, Gender gender) {
         this.name = name;
         int l = name.indexOf(' ');
         if (l != -1) {
@@ -44,12 +45,13 @@ public class Student {
             requirements.remove(new SubjectRequirement(klass.getSubject(), null));//this works because SubjectRequirement.equals only checks if their subjects are equal
             requirements.add(new KlassRequirement(klass));
         }
+        this.gender = gender;
     }
-    public Student(String name, Grade grade, Klass[] requiredClasses) {//to make it easier if you want to pass an array not arraylist
-        this(name, grade, new ArrayList<>(Arrays.asList(requiredClasses)));
+    public Student(String name, Grade grade, Klass[] requiredClasses, Gender gender) {//to make it easier if you want to pass an array not arraylist
+        this(name, grade, new ArrayList<>(Arrays.asList(requiredClasses)), gender);
     }
-    public Student(String name, Grade grade) {
-        this(name, grade, new ArrayList<>());
+    public Student(String name, Grade grade, Gender gender) {
+        this(name, grade, new ArrayList<>(), gender);
     }
     public int getNumFreeBlocks() {
         return Block.numBlocks - requirements.size();

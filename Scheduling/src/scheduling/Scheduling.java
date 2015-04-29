@@ -32,7 +32,7 @@ public class Scheduling {
         Subject history = new Subject("History", new String[] {"Swamp history"}, new int[] {2}, new Teacher[] {shrek});
         Student.addRequiredSubject(Grade.GRADE9, math);
         Student.addRequiredSubject(Grade.GRADE9, history);
-        Student dragon = new Student("Dragon", Grade.GRADE9, new Klass[] {math.klasses.get(0)});
+        Student dragon = new Student("Dragon", Grade.GRADE9, new Klass[] {math.klasses.get(0)}, Gender.MAIL);
         ArrayList<Student> students = new ArrayList<>(Arrays.asList(new Student[] {dragon}));
         System.out.println(dragon.getRequirements());
         ArrayList<Subject> subjects = new ArrayList<>(Arrays.asList(new Subject[] {math, history}));
@@ -54,7 +54,7 @@ public class Scheduling {
             subjects.add(dank);
         }
         for (int i = 0; i < 100; i++) {
-            Student dragon = new Student(grade + "student s" + i, grade);
+            Student dragon = new Student(grade + "student s" + i, grade, Gender.get(r.nextBoolean()));
             students.add(dragon);
         }
     }
@@ -78,7 +78,7 @@ public class Scheduling {
         createSubjects(Grade.GRADE10, subjects, students);
         createSubjects(Grade.GRADE11, subjects, students);
         createSubjects(Grade.GRADE12, subjects, students);
-        students.add(new Student("Leif Jurvetson", Grade.GRADE9));
+        students.add(new Student("Leif Jurvetson", Grade.GRADE9, Gender.MAIL));
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
         Gooey.setup();

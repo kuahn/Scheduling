@@ -15,6 +15,7 @@ public class Roster {
     public final ArrayList<Student> students;
     public final ArrayList<Section> sections;
     private final HashMap<Section, ArrayList<Student>> roster;
+    private final HashMap<Section, Integer> numMale;//helper to keep track of gender difference
     private final HashMap<Student, ArrayList<Section>> taking;
     private final Object lock = new Object();
     public Roster(ArrayList<Student> students, ArrayList<Section> sections) {
@@ -22,12 +23,14 @@ public class Roster {
         this.sections = sections;
         roster = new HashMap<>();
         taking = new HashMap<>();
+        numMale = new HashMap<>();
         synchronized (lock) {
             for (Student student : students) {
                 taking.put(student, new ArrayList<>());
             }
             for (Section section : sections) {
                 roster.put(section, new ArrayList<>());
+                numMale.put(section, 0);
             }
         }
     }
@@ -44,12 +47,18 @@ public class Roster {
             }
             roster.get(section).add(student);
             taking.get(student).add(section);
+            if (student.gender == Gender.MAIL) {
+                numMale.put(section, numMale.get(section) + 1);
+            }
         }
     }
     public void remove(Student student, Section section) {
         synchronized (lock) {
             roster.get(section).remove(student);
             taking.get(student).remove(section);
+            if (student.gender == Gender.MAIL) {
+                numMale.put(section, numMale.get(section) - 1);
+            }
         }
     }
     public Section getSection(Klass klass, Student student) {//In a certian klass, what section is this student in?
@@ -88,15 +97,20 @@ public class Roster {
              */
             String s = sections.parallelStream().map(section->{
                 List<Student> students = roster.get(section);
-                return section + " class list (" + students.size() + " students): " + students;
+                double ratio = ((double) numMale.get(section)) / ((double) students.size());
+                ratio = Math.floor(ratio * 10000) / 100;
+                return section + " class list (" + students.size() + " students, " + ratio + "% male): " + students;
             }).collect(Collectors.joining("\n", "Class lists:\n", "\n"));
             return s;
         }
     }
     public int numStudents(Section section) {
-        synchronized (lock) {
-            return roster.get(section).size();
-        }
+        //synchronized (lock) {
+        return roster.get(section).size();
+        //}
+    }
+    public int numMale(Section section) {
+        return numMale.get(section);
     }
     public void reset(Student student) {
         ArrayList<Section> takin = new ArrayList<>(getSections(student));
