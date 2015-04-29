@@ -96,7 +96,8 @@ public class NanoHTTPD {
         try {
             return call(uri, header);
         } catch (Exception exc) {
-            return new Response(HTTP_INTERNALERROR, exc.toString());
+            exc.printStackTrace();
+            return new Response(HTTP_INTERNALERROR, exc.toString() + exc.getMessage());
         }
         /*
          return serveFile(uri, header, myRootDir, true);*/

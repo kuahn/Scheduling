@@ -134,6 +134,9 @@ public class Teacher {
             aq(resp, b.toString());
             resp.append(':');
             List<Section> location = schedule.get(b);
+            if (location == null) {
+                location = new ArrayList<>();
+            }
             List<String> res = location.parallelStream().map(section->'"' + section.toString() + '"').collect(Collectors.toList());
             resp.append(res.toString());
             resp.append(",\n");

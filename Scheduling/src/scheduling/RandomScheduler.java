@@ -123,7 +123,6 @@ public class RandomScheduler extends Scheduler {
         List<Requirement> requirements = student.getRequirements();
         int numUn = 0;
         for (Requirement requirement : requirements) {//This cannot be done in a parallel stream because canJoinClass depends on previous class joining
-            //The combination of parallel, filter, and findany makes this effectively a random selection, I think
             Optional<Section> toJoin = requirement.getSectionOptionStream().parallel().filter(section->canJoinClass(student, section)).sorted(Comparator.comparingInt(section->temp.roster.numStudents(section))).findFirst();
             if (!toJoin.isPresent()) {
                 if (PRINT_UNF) {
