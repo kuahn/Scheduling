@@ -85,6 +85,18 @@ public class Scheduling {
         main2(args);
         System.in.read();
     }
+    public static String status() {
+        String r = "{\"hasSchedule\":" + (getSchedule() != null) + ",\"running\":" + running;
+        if (running) {
+            r = r + ",\"numAttempts\":" + numAt;
+            r = r + ",\"avgNumUnplac\":" + (numU / numAt);
+            long currTime = System.currentTimeMillis();
+            long diff = currTime - Scheduling.time;
+            r = r + ",\"runningTimeMS\":" + diff;
+        }
+        r = r + "}";
+        return r;
+    }
     public static void start() {
         if (rd.isFinished() || running) {
             return;

@@ -25,7 +25,7 @@ public class Schedule {
         this.sections = sections;
         this.students = students;
         this.roster = new Roster(students, sections);
-        teacherList = new ArrayList<>(sections.stream().flatMap(section->section.klass.teachers.stream()).distinct().collect(Collectors.toList()));
+        teacherList = sections.stream().flatMap(section->section.klass.teachers.stream()).distinct().collect(Collectors.toCollection(()->new ArrayList<>()));
     }
     public boolean verifyRoomsTeachers() {
         for (Block block : Block.blocks) {
@@ -47,25 +47,28 @@ public class Schedule {
         }
     }
     public String findConflicts() {
-        String roomConflicts = Room.getRooms().parallelStream().map(room->new Tuple<Room, List<String>>(room,
-                Stream.of(Block.blocks).parallel().map(
-                        block->new Tuple<Block, List<Section>>(
-                                block,
-                                sections.parallelStream().filter(section->room.equals(locations.get(section))
-                                        && block.equals(timings.get(section))).collect(Collectors.toList())
-                        )
-                ).filter(tuple->tuple.b.size() > 1).
-                map(tuple->"\"In room " + room + " during " + tuple.a + ", there are classes " + tuple.b + "\"").
-                collect(Collectors.toList()))
-        ).filter(tuple->!tuple.b.isEmpty()).map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
-        String teacherConflicts = teacherList.parallelStream().map(teacher->new Tuple<Teacher, List<String>>(teacher,
+        Stream<Tuple<Room, List<String>>> roomConf
+                = Room.getRooms().parallelStream().map(room->new Tuple<Room, List<String>>(room,
+                                Stream.of(Block.blocks).parallel().map(
+                                        block->new Tuple<Block, List<Section>>(
+                                                block,
+                                                sections.parallelStream().filter(section->room.equals(locations.get(section))
+                                                        && block.equals(timings.get(section))).collect(Collectors.toList())
+                                        )
+                                ).filter(tuple->tuple.b.size() > 1).
+                                map(tuple->"\"In room " + room + " during " + tuple.a + ", there are classes " + tuple.b + "\"").
+                                collect(Collectors.toList()))
+                ).filter(tuple->!tuple.b.isEmpty());
+        Stream<Tuple<Teacher, List<String>>> teacherConf = teacherList.parallelStream().map(teacher->new Tuple<Teacher, List<String>>(teacher,
                 Stream.of(Block.blocks).parallel().map(
                         block->new Tuple<Block, List<Section>>(
                                 block,
                                 sections.parallelStream().filter(section->teacher.equals(teachers.get(section)) && block.equals(timings.get(section))).collect(Collectors.toList())
                         )
                 ).filter(tuple->tuple.b.size() > 1).map(tuple->"\"Teacher " + teacher + " during " + tuple.a + " is teaching classes " + tuple.b + "\"").collect(Collectors.toList()))
-        ).filter(tuple->!tuple.b.isEmpty()).map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
+        ).filter(tuple->!tuple.b.isEmpty());
+        String roomConflicts = roomConf.map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
+        String teacherConflicts = teacherConf.map(tuple->"\n\"" + tuple.a + ":" + tuple.b).collect(Collectors.joining(",", "{", "}"));
         //System.out.println(roomConflicts);
         //System.out.println(teacherConflicts);
         return "{room:" + roomConflicts + ",\nteacher:" + teacherConflicts + "}";
@@ -115,11 +118,12 @@ public class Schedule {
         return null;
     }
     public Map<Block, List<Section>> getSchedule(Predicate<Section> pred) {//this version is slower (I think), but it doesn't matter
-        List<Section> k = sections.parallelStream()
-                .filter(pred).collect(Collectors.toList());
-        return convert(k);
+        return convert(sections.parallelStream().filter(pred));
     }
-    public Map<Block, List<Section>> convert(List<Section> k) {
+    public Map<Block, List<Section>> convert(Stream<Section> k) {
+        return k.collect(Collectors.groupingBy(section->timings.get(section)));
+    }
+    public Map<Block, List<Section>> convert1(List<Section> k) {
         return Stream.of(Block.blocks).parallel().map(block
                 ->new Tuple<Block, List<Section>>(block,
                         k.parallelStream()
@@ -134,7 +138,7 @@ public class Schedule {
     }
     public Map<Block, List<Section>> getStudentSchedule(Student student) {
         //return roster.getSections(student).parallelStream().collect(Collectors.toMap(section->timings.get(section), section->section));
-        return convert(roster.getSections(student));
+        return convert(roster.getSections(student).stream());
     }
     public Map<Teacher, Map<Block, List<Section>>> getTeacherSchedules() {
         return teacherList.parallelStream().collect(Collectors.toMap(teacher->teacher, teacher->getTeacherSchedule(teacher)));

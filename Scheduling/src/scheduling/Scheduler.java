@@ -24,7 +24,7 @@ public abstract class Scheduler {
         klasses.stream().forEach(klass->{
             sections.addAll(Arrays.asList(klass.sections));
         });
-        this.teachers = new ArrayList<>(klasses.stream().flatMap(klass->klass.teachers.stream()).distinct().collect(Collectors.toList()));
+        this.teachers = klasses.stream().flatMap(klass->klass.teachers.stream()).distinct().collect(Collectors.toCollection(()->new ArrayList<>()));
     }
     public abstract void startScheduling();
     public boolean isFinished() {

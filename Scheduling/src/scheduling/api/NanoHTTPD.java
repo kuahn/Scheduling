@@ -120,6 +120,9 @@ public class NanoHTTPD {
         if (uri.startsWith("list/")) {
             return list(uri.substring(5, uri.length()), header);
         }
+        if (uri.startsWith("status")) {
+            return new Response(HTTP_OK, Scheduling.status());
+        }
         return new Response(HTTP_FORBIDDEN, "lol your options are getinfo, conflicts, or list");
     }
     public Response list(String uri, Properties header) {
@@ -132,7 +135,10 @@ public class NanoHTTPD {
         if (uri.equals("teachers")) {
             return new Response(HTTP_OK, "{teachers:" + Scheduling.rd.teachers.parallelStream().map(teacher->"\"" + teacher.nuevaUsername + "\"").collect(Collectors.toList()) + "}");
         }
-        return new Response(HTTP_FORBIDDEN, "lol your options are students, rooms, or teachers");
+        if (uri.equals("sections")) {
+            return new Response(HTTP_OK, "{sections:" + Scheduling.rd.sections.parallelStream().map(student->"\"" + student + "\"").collect(Collectors.toList()) + "}");
+        }
+        return new Response(HTTP_FORBIDDEN, "lol your options are students, rooms, sections, or teachers");
     }
     public Response getinfo(String uri, Properties header) {
         if (uri.startsWith("room/")) {
