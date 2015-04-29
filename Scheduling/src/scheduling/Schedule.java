@@ -94,6 +94,9 @@ public class Schedule {
     public List<Section> getRoomUsage(Room room, Block time) {//well, there SHOULD only be one section in each room at once...
         return sections.parallelStream().filter(section->time.equals(timings.get(section)) && room.equals(locations.get(section))).collect(Collectors.toList());
     }
+    public boolean isRoomEmpty(Room room, Block time) {
+        return sections.parallelStream().anyMatch(section->time.equals(timings.get(section)) && room.equals(locations.get(section)));
+    }
     public Stream<Section> getStudentSectionStream(Student student, Block time) {//well, the student SHOULD only be in one section at once..
         return roster.getSections(student).stream().filter(section->time.equals(timings.get(section)));
     }

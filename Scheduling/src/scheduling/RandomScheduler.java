@@ -97,17 +97,18 @@ public class RandomScheduler extends Scheduler {
         System.out.println("Schedules for students: " + temp.getStudentSchedules());
         System.out.println(temp.roster);
         result = temp;
-        result.findConflicts();
-        Random r = new Random();
-        for (Section section : sections) {
-            if (r.nextInt(3) == 0) {
-                result.timings.put(section, Block.blocks[0]);
-            }
-            if (r.nextInt(3) == 0) {
-                result.timings.put(section, Block.blocks[1]);
-            }
-            //result.locations.put(section, Room.getRoomArray()[0]);
-        }
+        //result.findConflicts();
+        /*
+         Random r = new Random();
+         for (Section section : sections) {
+         if (r.nextInt(3) == 0) {
+         result.timings.put(section, Block.blocks[0]);
+         }
+         if (r.nextInt(3) == 0) {
+         result.timings.put(section, Block.blocks[1]);
+         }
+         //result.locations.put(section, Room.getRoomArray()[0]);
+         }*/
     }
     private void printSched() {
         for (Section section : sections) {
@@ -169,15 +170,23 @@ public class RandomScheduler extends Scheduler {
                     //if this continues, netbeans complains because b might not be initialized in temp.getTeacherLocation in the while condition on line 144
                 }
                 temp.teachers.put(section, t);
+                boolean f = false;
                 do {
                     b = workingBlocks.remove(rand.nextInt(workingBlocks.size()));
                     temp.timings.put(section, b);
                     if (temp.getTeacherLocation(t, b).size() <= 1 && roomUsage[b.blockID] < numRooms) {
+                        f = true;
                         break;
                     }
                 } while (!workingBlocks.isEmpty());
+                if (f) {
+                    break;
+                }
                 numAttempts++;
-            } while ((temp.getTeacherLocation(t, b).size() > 1 || roomUsage[b.blockID] >= numRooms) && numAttempts < TEACHER_ASSIGN_ATTEMPTS);
+                if (numAttempts >= TEACHER_ASSIGN_ATTEMPTS) {
+                    break;
+                }
+            } while (true);
             if (numAttempts >= TEACHER_ASSIGN_ATTEMPTS) {
                 for (int i = 0; i <= sectionID; i++) {//reset all sections up to and including this one
                     temp.teachers.put(sectionz.get(i), null);
@@ -188,6 +197,72 @@ public class RandomScheduler extends Scheduler {
             }
             int room = roomUsage[b.blockID]++;
             temp.locations.put(section, Room.getRoomArray()[room]);
+            // TODO deal with Klass.getAcceptableRooms()
+        }
+        return 1;
+    }
+    public int assignRandomBlocksAndTeachers1() {
+        Random rand = new Random();
+        int numSec = sections.size();
+        int numRooms = Room.getRoomArray().length;
+        ArrayList<Section> sectionz = new ArrayList<>(sections);
+        for (int i = 0; i < numSec; i++) {
+            sectionz.add(sectionz.remove(rand.nextInt(numSec)));
+        }
+        for (int sectionID = 0; sectionID < numSec; sectionID++) {
+            Section section = sectionz.get(sectionID);
+            ArrayList<Teacher> posss = section.getTeachers();
+            ArrayList<Room> acceptableRooms = new ArrayList<>(Arrays.asList(section.klass.acceptableRooms));
+            for (int i = 0; i < acceptableRooms.size(); i++) {//randomize
+                acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
+            }
+            Block b;
+            Teacher t;
+            int numAttempts = 0;
+            do {
+                t = posss.get(rand.nextInt(posss.size()));
+                ArrayList<Block> workingBlocks = new ArrayList<>(t.getWorkingBlocks());//some teachers only work some times, remember? grr
+                if (workingBlocks.isEmpty()) {
+                    //continue;
+                    //if this continues, netbeans complains because b might not be initialized in temp.getTeacherLocation in the while condition on line 144
+                }
+                temp.teachers.put(section, t);
+                boolean f = false;
+                do {
+                    acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
+                    b = workingBlocks.remove(rand.nextInt(workingBlocks.size()));
+                    temp.timings.put(section, b);
+                    if (temp.getTeacherLocation(t, b).size() <= 1) {
+                        boolean foundRoom = false;
+                        for (Room room : acceptableRooms) {
+                            if (temp.isRoomEmpty(room, b)) {
+                                temp.locations.put(section, room);
+                                foundRoom = true;
+                                break;
+                            }
+                        }
+                        if (foundRoom) {
+                            f = true;
+                            break;
+                        }
+                    }
+                } while (!workingBlocks.isEmpty());
+                if (f) {
+                    break;
+                }
+                numAttempts++;
+                if (numAttempts >= TEACHER_ASSIGN_ATTEMPTS) {
+                    break;
+                }
+            } while (true);
+            if (numAttempts >= TEACHER_ASSIGN_ATTEMPTS) {
+                for (int i = 0; i <= sectionID; i++) {//reset all sections up to and including this one
+                    temp.teachers.put(sectionz.get(i), null);
+                    temp.timings.put(sectionz.get(i), null);
+                    temp.locations.put(sectionz.get(i), null);
+                }
+                return -1;//if unable to assign teachers and blocks, don't even try to assign rooms
+            }
             // TODO deal with Klass.getAcceptableRooms()
         }
         return 1;
