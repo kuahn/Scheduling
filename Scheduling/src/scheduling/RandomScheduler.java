@@ -12,32 +12,12 @@ public class RandomScheduler extends Scheduler {
     }
     final static int STUDENT_ASSIGN_ATTEMPTS = 5;
     static final int TEACHER_ASSIGN_ATTEMPTS = 5;
-    static final int TOTAL_ASSIGN_ATTEMPTS = 1000;
+    static final int TOTAL_ASSIGN_ATTEMPTS1 = 10;
     static final boolean PRINT_ADDS = false;
     static final boolean PRINT_UNF = false;
     static final boolean PRINT_ATT = true;
     static final boolean PRINT_INIT = false;
     static final boolean PRINT_INIT_TIME = true;
-    ArrayList<Integer> randomAssignAttempts = new ArrayList<>();
-    public int allowedAttempts = 0;
-    public double average = 0;
-    public int max = 0;
-    public int calcAttempts() {
-        if (randomAssignAttempts.isEmpty()) {
-            return TOTAL_ASSIGN_ATTEMPTS;
-        }
-        OptionalDouble avg = randomAssignAttempts.parallelStream().mapToInt(x->x).average();
-        if (avg.isPresent()) {
-            double d = avg.getAsDouble() * 2 + 2;
-            average = (d - 2) / 2;
-            int dd = (int) Math.ceil(d);
-            if (dd >= TOTAL_ASSIGN_ATTEMPTS) {
-                return TOTAL_ASSIGN_ATTEMPTS;
-            }
-            return dd;
-        }
-        return TOTAL_ASSIGN_ATTEMPTS;
-    }
     @Override
     public void startScheduling() {
         if (isFinished()) {
@@ -45,20 +25,15 @@ public class RandomScheduler extends Scheduler {
             return;
         }
         int numAttempts = 0;
-        allowedAttempts = calcAttempts();
         long time = System.currentTimeMillis();
-        while (assignRandomBlocksAndTeachers() < 0 && numAttempts < allowedAttempts) {
+        while (assignRandomBlocksAndTeachers() < 0 && numAttempts < TOTAL_ASSIGN_ATTEMPTS1) {
             numAttempts++;
         }
         long after = System.currentTimeMillis();
-        randomAssignAttempts.add(numAttempts);
-        if (numAttempts > max) {
-            max = numAttempts;
-        }
         if (PRINT_INIT_TIME) {
             System.out.println("Inital took" + (after - time) + "ms, " + (numAttempts + 1) + " attempts");
         }
-        if (numAttempts >= allowedAttempts) {
+        if (numAttempts >= TOTAL_ASSIGN_ATTEMPTS1) {
             throw new IllegalStateException("I");
         }
         if (!temp.verifyRoomsTeachers()) {
@@ -155,7 +130,7 @@ public class RandomScheduler extends Scheduler {
     }
     public static boolean canJoinClass(Student student, Section section, Schedule schedule) {
         //ONLY for can the student PHYSICALLY join the class
-        //other things like class size and
+        //other things like class size and gender bias are dealt with in the sort after this filter
         Block sectionTime = schedule.timings.get(section);
         if (sectionTime == null) {
             throw new IllegalArgumentException("must assign section times before class list");

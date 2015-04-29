@@ -95,12 +95,8 @@ public class InfoTab extends JComponent {
             String avgPercentUnplac = toPercent(Scheduling.numU / (Scheduling.numAt * Scheduling.numStud));
             String a = ("On average, " + avgNumUnplac + " of " + Scheduling.numStud + ", or " + avgPercentUnplac + " of students, are unplacable. (" + Scheduling.numAt + " attempts so far)");
             String b = (diff / 1000 + " seconds since start, on average " + speed + " guesses/sec");
-            String c = ("Average number of room&teacher assignment guesses required for solution: " + Scheduling.rd.average);
-            String d = ("Maximum number of assignment guesses required for solution:" + Scheduling.rd.max);
             A.setText(a);
             B.setText(b);
-            C.setText(c);
-            D.setText(d);
             startstop.setText("stop");
         } else {
             startstop.setText("start");
