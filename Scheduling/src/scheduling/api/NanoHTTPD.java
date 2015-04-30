@@ -96,6 +96,9 @@ public class NanoHTTPD {
         try {
             return call(uri, header);
         } catch (Exception exc) {
+            if (Scheduling.getSchedule() == null) {
+                return new Response(HTTP_INTERNALERROR, Scheduling.status());
+            }
             exc.printStackTrace();
             return new Response(HTTP_INTERNALERROR, exc.toString() + exc.getMessage());
         }
