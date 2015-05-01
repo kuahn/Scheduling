@@ -114,9 +114,9 @@ public class NanoHTTPD {
         if (uri.startsWith("/api")) {
             return api(uri.substring(5, uri.length()), header);
         }
-        return serveFile(uri, header, new File(System.getProperty("user.home")), true);
+        //return serveFile(uri, header, new File(System.getProperty("user.home")), true);
         //System.out.println("lol doesn't exist");
-        //return new Response(HTTP_FORBIDDEN, "lol that doesnt exist");
+        return new Response(HTTP_FORBIDDEN, "lol that doesnt exist");
     }
     public Response api(String uri, Properties header) {
         if (uri.startsWith("getinfo/")) {
