@@ -69,7 +69,7 @@ public class Teacher {
         int blockID = b.blockID;
         boolean current = workingBlocks[blockID];
         workingBlocks[blockID] = doesWork;
-        System.out.println(this + (doesWork ? " works" : " does not work") + " during " + b);
+        //System.out.println(this + (doesWork ? " works" : " does not work") + " during " + b);
         if (doesWork ^ current) {//if it changed
             if (doesWork) {
                 workBlocks.add(b);
@@ -81,7 +81,7 @@ public class Teacher {
     public final void setDoesWork(int id, boolean doesWork) {
         boolean current = workingBlocks[id];
         workingBlocks[id] = doesWork;
-        System.out.println(this + (doesWork ? " works" : " does not work") + " during Block " + id);
+        //System.out.println(this + (doesWork ? " works" : " does not work") + " during Block " + id);
         if (doesWork ^ current) {//if it changed
             Block b = Block.blocks[id];
             if (doesWork) {

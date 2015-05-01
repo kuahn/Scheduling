@@ -92,6 +92,7 @@ public class Scheduling {
         read();
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
+        save();
         Gooey.setup();
     }
     public static void save() throws IOException {
@@ -127,12 +128,10 @@ public class Scheduling {
         for (int i = 0; i < numTeachers; i++) {
             teachers.add(Teacher.read(shrek));
         }
-        System.out.println(teachers);
         int numSubjects = shrek.readInt();
         subjects = new ArrayList<>(numSubjects);
         for (int i = 0; i < numSubjects; i++) {
             Subject subject = Subject.read(shrek);
-            System.out.println(subject.klasses);
             subjects.add(subject);
         }
         for (int grade = 9; grade <= 12; grade++) {
@@ -142,6 +141,7 @@ public class Scheduling {
                 String subjectname = shrek.readUTF();
                 Subject subject = getSubject(subjectname);
                 Student.addRequiredSubject(grad, subject);
+                System.out.println(grad + "," + subject);
             }
         }
         int numStudents = shrek.readInt();
@@ -157,13 +157,13 @@ public class Scheduling {
         return null;
     }
     public static Subject getSubject(String subjectName) {
-        return get(subjects.parallelStream().filter(subject->subject.name.equals(subjectName)).findAny());
+        return subjects.parallelStream().filter(subject->subject.name.equals(subjectName)).findAny().get();
     }
     public static Teacher getTeacher(String nuevaUsername) {
-        return get(teachers.parallelStream().filter(teacher->teacher.nuevaUsername.equals(nuevaUsername)).findAny());
+        return teachers.parallelStream().filter(teacher->teacher.nuevaUsername.equals(nuevaUsername)).findAny().get();
     }
     public static Klass getKlass(String klassName) {
-        return get(subjects.parallelStream().flatMap(subject->subject.klasses.parallelStream()).filter(klass->klass.toString().equals(klassName)).findAny());
+        return subjects.parallelStream().flatMap(subject->subject.klasses.parallelStream()).filter(klass->klass.toString().equals(klassName)).findAny().get();
     }
     public static void main(String[] args) throws IOException {
         NanoHTTPD.init();

@@ -11,7 +11,7 @@ public class RandomScheduler extends Scheduler {
         temp = new Schedule(this.sections, this.students);
     }
     final static int STUDENT_ASSIGN_ATTEMPTS = 5;
-    static final int TEACHER_ASSIGN_ATTEMPTS = 5;
+    static final int TEACHER_ASSIGN_ATTEMPTS = 10;
     static final int TOTAL_ASSIGN_ATTEMPTS1 = 10;
     static final boolean PRINT_ADDS = false;
     static final boolean PRINT_UNF = false;
@@ -148,6 +148,10 @@ public class RandomScheduler extends Scheduler {
         for (int sectionID = 0; sectionID < numSec; sectionID++) {
             Section section = sectionz.get(sectionID);
             ArrayList<Teacher> posss = section.getTeachers();
+            if (posss.isEmpty()) {
+                System.out.println(section);
+                System.exit(0);
+            }
             ArrayList<Room> acceptableRooms = new ArrayList<>(section.klass.acceptableRooms);
             for (int i = 0; i < acceptableRooms.size(); i++) {//randomize
                 acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
@@ -157,7 +161,8 @@ public class RandomScheduler extends Scheduler {
                 Teacher t = posss.get(rand.nextInt(posss.size()));
                 ArrayList<Block> workingBlocks = new ArrayList<>(t.getWorkingBlocks());//some teachers only work some times, remember? grr
                 if (workingBlocks.isEmpty()) {
-                    //continue;
+                    System.out.println("aontehuidhntoaeui");
+                    System.exit(0);
                     //if this continues, netbeans complains because b might not be initialized in temp.getTeacherLocation in the while condition on line 144
                 }
                 boolean f = false;

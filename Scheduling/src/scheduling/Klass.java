@@ -43,7 +43,11 @@ public class Klass {
         if (!s.hasKlass(this)) {
             throw new IllegalStateException("YOU ARE NOT MY REAL SUBJECT");
         }
-        teachers.addAll(s.teachers);
+        for (Teacher t : s.teachers) {
+            if (!teachers.contains(t)) {
+                teachers.add(t);
+            }
+        }
         subject = s;
     }
     public Subject getSubject() {
@@ -71,9 +75,9 @@ public class Klass {
         output.writeInt(numSections);
         ArrayList<String> teacherUsernames = new ArrayList<>();
         for (Teacher t : teachers) {
-            if (!subject.teachers.contains(t)) {
-                teacherUsernames.add(t.nuevaUsername);
-            }
+            //if (!subject.teachers.contains(t)) {
+            teacherUsernames.add(t.nuevaUsername);
+            //}
         }
         output.writeInt(teacherUsernames.size());
         for (String kuSh : teacherUsernames) {
@@ -93,10 +97,12 @@ public class Klass {
             teachers.add(Scheduling.getTeacher(input.readUTF()));
         }
         int numAcceptableRooms = input.readInt();
-        ArrayList<Room> kUsH = new ArrayList<>(numAcceptableRooms);
+        ArrayList<Room> acceptableRooms = new ArrayList<>(numAcceptableRooms);
         for (int i = 0; i < numAcceptableRooms; i++) {
-            kUsH.add(Room.getRoom(input.readInt()));
+            acceptableRooms.add(Room.getRoom(input.readInt()));
         }
-        return new Klass(name, numSections, teachers, kUsH);
+        Klass k = new Klass(name, numSections, teachers, acceptableRooms);
+        System.out.println(k + "," + acceptableRooms);
+        return k;
     }
 }
