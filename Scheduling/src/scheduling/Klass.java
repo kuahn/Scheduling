@@ -75,9 +75,9 @@ public class Klass {
         output.writeInt(numSections);
         ArrayList<String> teacherUsernames = new ArrayList<>();
         for (Teacher t : teachers) {
-            //if (!subject.teachers.contains(t)) {
-            teacherUsernames.add(t.nuevaUsername);
-            //}
+            if (!subject.teachers.contains(t)) {
+                teacherUsernames.add(t.nuevaUsername);
+            }
         }
         output.writeInt(teacherUsernames.size());
         for (String kuSh : teacherUsernames) {
