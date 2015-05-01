@@ -68,10 +68,10 @@ public class Scheduling {
     public static ArrayList<Subject> subjects;
     public static ArrayList<Teacher> teachers;
     public static boolean running = false;
-    public static void main3(String[] args) throws IOException {
+    public static void main2(String[] args) throws IOException, InterruptedException {
         students = new ArrayList<>();
         subjects = new ArrayList<>();
-        Teacher[] langTeach = new Teacher[] {new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++))};
+        Teacher[] langTeach = new Teacher[] {new Teacher("Teech " + (ti++)), new Teacher("Teech " + (ti++)), new Teacher("Teech " + (ti++))};
         language = new Subject("Language", new String[] {"Spanish 1", "Spanish 2", "Japanese 1", "Japanese 2", "Mandarin 1", "Mandarin 2"}, new int[] {2, 2, 2, 2, 2, 2}, langTeach);
         subjects.add(language);
         Student.addRequiredSubject(Grade.GRADE9, language);
@@ -80,15 +80,16 @@ public class Scheduling {
         createSubjects(Grade.GRADE10, subjects, students);
         createSubjects(Grade.GRADE11, subjects, students);
         createSubjects(Grade.GRADE12, subjects, students);
-        students.add(new Student("Leif Jurvetson", Grade.GRADE9, Gender.MAIL));
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
         teachers = rd.teachers;
         save();
         Gooey.setup();
+        Thread.sleep(10000);
+        onAddStudent(new Student("Leif Jurvetson", Grade.GRADE9, Gender.MAIL));
         //System.exit(0);
     }
-    public static void main2(String[] args) throws IOException {
+    public static void main3(String[] args) throws IOException {
         read();
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
@@ -165,7 +166,11 @@ public class Scheduling {
     public static Klass getKlass(String klassName) {
         return subjects.parallelStream().flatMap(subject->subject.klasses.parallelStream()).filter(klass->klass.toString().equals(klassName)).findAny().get();
     }
-    public static void main(String[] args) throws IOException {
+    public static void onAddStudent(Student student) {
+        students.add(student);
+        rd.onAddStudent(student);
+    }
+    public static void main(String[] args) throws Exception {
         NanoHTTPD.init();
         main2(args);
         System.in.read();

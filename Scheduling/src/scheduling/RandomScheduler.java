@@ -199,4 +199,7 @@ public class RandomScheduler extends Scheduler {
             temp.locations.put(section, null);
         }
     }
+    public void onAddStudent(Student student) {
+        temp.roster.addStudent(student);
+    }
 }

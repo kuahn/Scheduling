@@ -10,8 +10,9 @@ import java.util.stream.Stream;
  * @author leijurv
  */
 public class Student {
-    private static final HashMap<Grade, ArrayList<SubjectRequirement>> allRequiredSubjects;
-    public final ArrayList<Requirement> requirements;
+    private static final HashMap<Grade, ArrayList<Requirement>> allRequiredSubjects;
+    public ArrayList<Requirement> requirements;
+    public final ArrayList<KlassRequirement> customRequirements;
     public final String name;
     public final String firstName;
     public final String lastName;//if the name is ellie van der rine, the lastname would be "van der rine" and the firstname would be "ellie"
@@ -71,11 +72,9 @@ public class Student {
         String cut = lastName.split(" ")[0];//elllie van der rijn goes to elivan not elivand
         nuevaUsername = (firstName.length() < 3 ? firstName : firstName.substring(0, 3)) + (cut.length() < 4 ? cut : cut.substring(0, 4)).toLowerCase();
         this.grade = grade;
-        requirements = new ArrayList<>(allRequiredSubjects.get(grade));
-        for (Klass klass : requiredClasses) {//if the student is required to take Algebra II, remove the redundant requirement to take one math class
-            requirements.remove(new SubjectRequirement(klass.getSubject(), null));//this works because SubjectRequirement.equals only checks if their subjects are equal
-            requirements.add(new KlassRequirement(klass));
-        }
+        requirements = allRequiredSubjects.get(grade);//don't duplicate, because we want changes to requirements for the whole grade propogate to all the students
+        customRequirements = requiredClasses.parallelStream().map(klass->new KlassRequirement(klass)).collect(Collectors.toCollection(()->new ArrayList<>()));
+        rebuildRequirements();
         this.gender = gender;
     }
     public Student(String name, Grade grade, Klass[] requiredClasses, Gender gender) {//to make it easier if you want to pass an array not arraylist
@@ -120,7 +119,7 @@ public class Student {
         return unfufilledRequirementsStream(this, r);
     }
     public static ArrayList<SubjectRequirement> getSubjectRequirements(int grade) {
-        return new ArrayList<>(allRequiredSubjects.get(Grade.swamplord420noscope(grade)));
+        return allRequiredSubjects.get(Grade.swamplord420noscope(grade)).stream().map(req->(SubjectRequirement) req).collect(Collectors.toCollection(()->new ArrayList<SubjectRequirement>()));
     }
     @Override
     public String toString() {
@@ -171,5 +170,11 @@ public class Student {
         r.append("\"");
         r.append(s);
         r.append("\"");
+    }
+    public final void rebuildRequirements() {
+        for (KlassRequirement klassRequirement : customRequirements) {//if the student is required to take Algebra II, remove the redundant requirement to take one math class
+            requirements.remove(new SubjectRequirement(klassRequirement.klass.getSubject(), null));//this works because SubjectRequirement.equals only checks if their subjects are equal
+            requirements.add(klassRequirement);
+        }
     }
 }

@@ -69,7 +69,7 @@ public class Roster {
         return null;
     }
     public List<Section> getSections(Subject subject, Student student) {//same, but a student can be in multiple sections of the same subject
-        return new ArrayList<>(getSections(student)).parallelStream().filter((currentlyTaking)->(currentlyTaking.isIn(subject))).collect(Collectors.toList());
+        return getSections(student).parallelStream().filter((currentlyTaking)->(currentlyTaking.isIn(subject))).collect(Collectors.toList());
     }
     public ArrayList<Section> getSections(Student student) {
         synchronized (lock) {
@@ -130,5 +130,8 @@ public class Roster {
                 }
             }
         }
+    }
+    public void addStudent(Student student) {
+        taking.put(student, new ArrayList<>());
     }
 }
