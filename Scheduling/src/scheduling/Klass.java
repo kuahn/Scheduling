@@ -76,7 +76,7 @@ public class Klass {
         ArrayList<String> teacherUsernames = new ArrayList<>();
         for (Teacher t : teachers) {
             if (!subject.teachers.contains(t)) {
-                teacherUsernames.add(t.nuevaUsername);
+                teacherUsernames.add(t.name);
             }
         }
         output.writeInt(teacherUsernames.size());

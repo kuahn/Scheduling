@@ -20,6 +20,9 @@ public class RandomScheduler extends Scheduler {
     static final boolean PRINT_INIT_TIME = true;
     @Override
     public void startScheduling() {
+        for (Section s : sections) {
+            System.out.println(s + ":" + s.getTeachers());
+        }
         if (isFinished()) {
             System.out.println("Already finished");
             return;
@@ -147,53 +150,47 @@ public class RandomScheduler extends Scheduler {
         }
         for (int sectionID = 0; sectionID < numSec; sectionID++) {
             Section section = sectionz.get(sectionID);
-            ArrayList<Teacher> posss = section.getTeachers();
-            if (posss.isEmpty()) {
-                System.out.println(section);
-                System.exit(0);
-            }
-            ArrayList<Room> acceptableRooms = new ArrayList<>(section.klass.acceptableRooms);
-            for (int i = 0; i < acceptableRooms.size(); i++) {//randomize
-                acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
-            }
-            int numAttempts = 0;
-            do {
-                Teacher t = posss.get(rand.nextInt(posss.size()));
-                ArrayList<Block> workingBlocks = new ArrayList<>(t.getWorkingBlocks());//some teachers only work some times, remember? grr
-                if (workingBlocks.isEmpty()) {
-                    System.out.println("aontehuidhntoaeui");
-                    System.exit(0);
-                    //if this continues, netbeans complains because b might not be initialized in temp.getTeacherLocation in the while condition on line 144
-                }
-                boolean f = false;
-                do {
-                    acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
-                    Block b = workingBlocks.remove(rand.nextInt(workingBlocks.size()));
-                    if (temp.isTeacherUnoccupied(t, b)) {
-                        Optional<Room> r = acceptableRooms.parallelStream().filter(room->temp.isRoomEmpty(room, b)).findAny();
-                        if (r.isPresent()) {
-                            temp.teachers.put(section, t);
-                            temp.timings.put(section, b);
-                            temp.locations.put(section, r.get());
-                            f = true;
-                            break;
-                        }
-                    }
-                } while (!workingBlocks.isEmpty());
-                if (f) {
-                    break;
-                }
-                numAttempts++;
-                if (numAttempts >= TEACHER_ASSIGN_ATTEMPTS) {
-                    break;
-                }
-            } while (true);
-            if (numAttempts >= TEACHER_ASSIGN_ATTEMPTS) {
-                reset();
+            if (!place(section, rand)) {
                 return -1;
             }
         }
         return 1;
+    }
+    public boolean place(Section section, Random rand) {
+        ArrayList<Teacher> posss = new ArrayList<>(section.getTeachers());
+        if (posss.isEmpty()) {
+            System.out.println(section);
+            System.exit(0);
+        }
+        ArrayList<Room> acceptableRooms = new ArrayList<>(section.klass.acceptableRooms);
+        // for (int i = 0; i < acceptableRooms.size(); i++) {//randomize
+        //    acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
+        // }
+        boolean df = false;
+        while (!posss.isEmpty()) {
+            Teacher t = posss.remove(rand.nextInt(posss.size()));
+            ArrayList<Block> workingBlocks = new ArrayList<>(t.getWorkingBlocks());//some teachers only work some times, remember? grr
+            if (workingBlocks.isEmpty()) {
+                System.out.println("aontehuidhntoaeui");
+                System.exit(0);
+                //if this continues, netbeans complains because b might not be initialized in temp.getTeacherLocation in the while condition on line 144
+            }
+            boolean f = false;
+            while (!workingBlocks.isEmpty()) {
+                //acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
+                Block b = workingBlocks.remove(rand.nextInt(workingBlocks.size()));
+                if (temp.isTeacherUnoccupied(t, b)) {
+                    Optional<Room> r = acceptableRooms.parallelStream().filter(room->temp.isRoomEmpty(room, b)).findAny();
+                    if (r.isPresent()) {
+                        temp.teachers.put(section, t);
+                        temp.timings.put(section, b);
+                        temp.locations.put(section, r.get());
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     public void reset() {
         for (Section section : sections) {

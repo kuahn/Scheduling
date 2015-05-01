@@ -92,7 +92,7 @@ public class Scheduling {
         read();
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
-        save();
+        //save();
         Gooey.setup();
     }
     public static void save() throws IOException {
@@ -160,7 +160,7 @@ public class Scheduling {
         return subjects.parallelStream().filter(subject->subject.name.equals(subjectName)).findAny().get();
     }
     public static Teacher getTeacher(String nuevaUsername) {
-        return teachers.parallelStream().filter(teacher->teacher.nuevaUsername.equals(nuevaUsername)).findAny().get();
+        return teachers.parallelStream().filter(teacher->teacher.name.equals(nuevaUsername)).findAny().get();
     }
     public static Klass getKlass(String klassName) {
         return subjects.parallelStream().flatMap(subject->subject.klasses.parallelStream()).filter(klass->klass.toString().equals(klassName)).findAny().get();

@@ -59,7 +59,7 @@ public class Subject {
         int numAcceptableTeachers = teachers.size();
         output.writeInt(numAcceptableTeachers);
         for (Teacher t : teachers) {
-            output.writeUTF(t.nuevaUsername);
+            output.writeUTF(t.name);
         }
         int numKlass = klasses.size();
         output.writeInt(numKlass);
