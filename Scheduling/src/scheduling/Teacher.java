@@ -1,4 +1,5 @@
 package scheduling;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +20,18 @@ public class Teacher {
     final ArrayList<Subject> subjectsTeached;
     final ArrayList<Klass> klassesTeached;
     public void write(DataOutputStream output) throws IOException {
+        output.writeUTF(name);
+        for (int i = 0; i < workingBlocks.length; i++) {
+            output.writeBoolean(workingBlocks[i]);
+        }
+    }
+    public static Teacher read(DataInputStream input) throws IOException {
+        String name = input.readUTF();
+        Teacher teacher = new Teacher(name);
+        for (int i = 0; i < Block.numBlocks; i++) {
+            teacher.setDoesWork(i, input.readBoolean());
+        }
+        return teacher;
     }
     public Teacher(String name) {
         this.name = name;

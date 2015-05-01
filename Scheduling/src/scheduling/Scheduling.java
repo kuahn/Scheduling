@@ -68,7 +68,7 @@ public class Scheduling {
     public static ArrayList<Subject> subjects;
     public static ArrayList<Teacher> teachers;
     public static boolean running = false;
-    public static void main2(String[] args) throws IOException {
+    public static void main3(String[] args) throws IOException {
         students = new ArrayList<>();
         subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++)), new Teacher("Teech" + (ti++))};
@@ -84,8 +84,15 @@ public class Scheduling {
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
         teachers = rd.teachers;
+        save();
         Gooey.setup();
         //System.exit(0);
+    }
+    public static void main2(String[] args) throws IOException {
+        read();
+        numStud = students.size();
+        rd = new RandomScheduler(students, subjects);
+        Gooey.setup();
     }
     public static void save() throws IOException {
         String base = System.getProperty("user.home") + "/Documents/saveFile";
@@ -95,20 +102,68 @@ public class Scheduling {
         for (Teacher t : teachers) {
             t.write(shrek);
         }
+        shrek.writeInt(subjects.size());
+        for (Subject s : subjects) {
+            s.write(shrek);
+        }
+        for (int grade = 9; grade <= 12; grade++) {
+            ArrayList<SubjectRequirement> req = Student.getSubjectRequirements(grade);
+            shrek.writeInt(req.size());
+            for (int i = 0; i < req.size(); i++) {
+                shrek.writeUTF(req.get(i).subject.name);
+            }
+        }
+        shrek.writeInt(students.size());
+        for (Student s : students) {
+            s.write(shrek);
+        }
+    }
+    public static void read() throws IOException {
+        String base = System.getProperty("user.home") + "/Documents/saveFile";
+        File dank = new File(base);
+        DataInputStream shrek = new DataInputStream(new FileInputStream(dank));
+        int numTeachers = shrek.readInt();
+        teachers = new ArrayList<>(numTeachers);
+        for (int i = 0; i < numTeachers; i++) {
+            teachers.add(Teacher.read(shrek));
+        }
+        System.out.println(teachers);
+        int numSubjects = shrek.readInt();
+        subjects = new ArrayList<>(numSubjects);
+        for (int i = 0; i < numSubjects; i++) {
+            Subject subject = Subject.read(shrek);
+            System.out.println(subject.klasses);
+            subjects.add(subject);
+        }
+        for (int grade = 9; grade <= 12; grade++) {
+            Grade grad = Grade.swamplord420noscope(grade);
+            int numReq = shrek.readInt();
+            for (int i = 0; i < numReq; i++) {
+                String subjectname = shrek.readUTF();
+                Subject subject = getSubject(subjectname);
+                Student.addRequiredSubject(grad, subject);
+            }
+        }
+        int numStudents = shrek.readInt();
+        students = new ArrayList<>(numStudents);
+        for (int i = 0; i < numStudents; i++) {
+            students.add(Student.read(shrek));
+        }
+    }
+    public static <Swamp> Swamp get(Optional<Swamp> result) {
+        if (result.isPresent()) {
+            return result.get();
+        }
+        return null;
+    }
+    public static Subject getSubject(String subjectName) {
+        return get(subjects.parallelStream().filter(subject->subject.name.equals(subjectName)).findAny());
     }
     public static Teacher getTeacher(String nuevaUsername) {
-        Optional<Teacher> result = teachers.parallelStream().filter(teacher->teacher.nuevaUsername.equals(nuevaUsername)).findAny();
-        if (result.isPresent()) {
-            return result.get();
-        }
-        return null;
+        return get(teachers.parallelStream().filter(teacher->teacher.nuevaUsername.equals(nuevaUsername)).findAny());
     }
     public static Klass getKlass(String klassName) {
-        Optional<Klass> result = subjects.parallelStream().flatMap(subject->subject.klasses.parallelStream()).filter(klass->klass.toString().equals(klassName)).findAny();
-        if (result.isPresent()) {
-            return result.get();
-        }
-        return null;
+        return get(subjects.parallelStream().flatMap(subject->subject.klasses.parallelStream()).filter(klass->klass.toString().equals(klassName)).findAny());
     }
     public static void main(String[] args) throws IOException {
         NanoHTTPD.init();

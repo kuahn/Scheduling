@@ -70,17 +70,17 @@ public class Subject {
     public static Subject read(DataInputStream input) throws IOException {
         String name = input.readUTF();
         int numTeach = input.readInt();
-        ArrayList<Teacher> kush = new ArrayList<>(numTeach);
+        ArrayList<Teacher> teachers = new ArrayList<>(numTeach);
         for (int i = 0; i < numTeach; i++) {
-            kush.add(Scheduling.getTeacher(input.readUTF()));
+            teachers.add(Scheduling.getTeacher(input.readUTF()));
         }
         int numKlass = input.readInt();
-        ArrayList<Klass> kUsh = new ArrayList<>(numKlass);
+        ArrayList<Klass> klasses = new ArrayList<>(numKlass);
         for (int i = 0; i < numKlass; i++) {
             Klass klass = Klass.read(input);
-            kUsh.add(klass);
+            klasses.add(klass);
         }
-        return new Subject(name, kUsh, kush);
+        return new Subject(name, klasses, teachers);
     }
     public boolean hasKlass(Klass klass) {
         return klasses.contains(klass);

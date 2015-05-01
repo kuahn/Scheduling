@@ -24,6 +24,7 @@ public class Klass {
             sections[i] = new Section(this, i);
         }
         teachers = new ArrayList<>(customTeachers);
+        teachers.stream().forEach(teacher->teacher.klassesTeached.add(this));
         this.acceptableRooms = new ArrayList<>(acceptableRooms);
     }
     public Klass(String name, int numSections, Teacher[] customTeachers, ArrayList<Room> acceptableRooms) {
@@ -68,14 +69,14 @@ public class Klass {
     public void write(DataOutputStream output) throws IOException {
         output.writeUTF(name);
         output.writeInt(numSections);
-        ArrayList<String> kush = new ArrayList<>();
+        ArrayList<String> teacherUsernames = new ArrayList<>();
         for (Teacher t : teachers) {
             if (!subject.teachers.contains(t)) {
-                kush.add(t.nuevaUsername);
+                teacherUsernames.add(t.nuevaUsername);
             }
         }
-        output.writeInt(kush.size());
-        for (String kuSh : kush) {
+        output.writeInt(teacherUsernames.size());
+        for (String kuSh : teacherUsernames) {
             output.writeUTF(kuSh);
         }
         output.writeInt(acceptableRooms.size());
@@ -84,18 +85,18 @@ public class Klass {
         }
     }
     public static Klass read(DataInputStream input) throws IOException {
-        String kush = input.readUTF();
-        int kusH = input.readInt();
-        int kuSh = input.readInt();
-        ArrayList<Teacher> kuSH = new ArrayList<>(kuSh);
-        for (int kUsh = 0; kUsh < kuSh; kUsh++) {
-            kuSH.add(Scheduling.getTeacher(input.readUTF()));
+        String name = input.readUTF();
+        int numSections = input.readInt();
+        int numTeachers = input.readInt();
+        ArrayList<Teacher> teachers = new ArrayList<>(numTeachers);
+        for (int i = 0; i < numTeachers; i++) {
+            teachers.add(Scheduling.getTeacher(input.readUTF()));
         }
-        int kUsh = input.readInt();
-        ArrayList<Room> kUsH = new ArrayList<>(kUsh);
-        for (int kUSh = 0; kUSh < kUsh; kUSh++) {
+        int numAcceptableRooms = input.readInt();
+        ArrayList<Room> kUsH = new ArrayList<>(numAcceptableRooms);
+        for (int i = 0; i < numAcceptableRooms; i++) {
             kUsH.add(Room.getRoom(input.readInt()));
         }
-        return new Klass(kush, kusH, kuSH, kUsH);
+        return new Klass(name, numSections, teachers, kUsH);
     }
 }

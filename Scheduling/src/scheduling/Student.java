@@ -119,6 +119,9 @@ public class Student {
     public Stream<Requirement> getRequirementStream(Roster r) {
         return unfufilledRequirementsStream(this, r);
     }
+    public static ArrayList<SubjectRequirement> getSubjectRequirements(int grade) {
+        return new ArrayList<>(allRequiredSubjects.get(Grade.swamplord420noscope(grade)));
+    }
     @Override
     public String toString() {
         return name;
