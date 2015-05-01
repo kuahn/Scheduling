@@ -1,4 +1,7 @@
 package scheduling;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -12,6 +15,12 @@ public class Subject {
     public final ArrayList<Teacher> teachers;
     public Subject(String name, ArrayList<Klass> klasses, Teacher[] teachers) {
         this.teachers = new ArrayList<>(Arrays.asList(teachers));
+        this.klasses = klasses;
+        this.name = name;
+        registerKlasses();
+    }
+    public Subject(String name, ArrayList<Klass> klasses, ArrayList<Teacher> teachers) {
+        this.teachers = teachers;
         this.klasses = klasses;
         this.name = name;
         registerKlasses();
@@ -44,6 +53,34 @@ public class Subject {
         klasses.stream().parallel().forEach((klass)->{//This is thread safe because ArrayList.contains is thread safe
             klass.registerSubject(this);
         });
+    }
+    public void write(DataOutputStream output) throws IOException {
+        output.writeUTF(name);
+        int numAcceptableTeachers = teachers.size();
+        output.writeInt(numAcceptableTeachers);
+        for (Teacher t : teachers) {
+            output.writeUTF(t.nuevaUsername);
+        }
+        int numKlass = klasses.size();
+        output.writeInt(numKlass);
+        for (Klass k : klasses) {
+            k.write(output);
+        }
+    }
+    public static Subject read(DataInputStream input) throws IOException {
+        String name = input.readUTF();
+        int numTeach = input.readInt();
+        ArrayList<Teacher> kush = new ArrayList<>(numTeach);
+        for (int i = 0; i < numTeach; i++) {
+            kush.add(Scheduling.getTeacher(input.readUTF()));
+        }
+        int numKlass = input.readInt();
+        ArrayList<Klass> kUsh = new ArrayList<>(numKlass);
+        for (int i = 0; i < numKlass; i++) {
+            Klass klass = Klass.read(input);
+            kUsh.add(klass);
+        }
+        return new Subject(name, kUsh, kush);
     }
     public boolean hasKlass(Klass klass) {
         return klasses.contains(klass);

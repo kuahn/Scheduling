@@ -1,4 +1,7 @@
 package scheduling;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,6 +18,34 @@ public class Student {
     public final String nuevaUsername;
     public final Grade grade;
     public final Gender gender;
+    public void write(DataOutputStream output) throws IOException {
+        output.writeUTF(name);
+        output.writeInt(grade.grade);
+        output.writeBoolean(gender == Gender.MAIL);
+        int i = 0;
+        for (Requirement r : requirements) {
+            if (r instanceof KlassRequirement) {
+                i++;
+            }
+        }
+        output.writeInt(i);
+        for (Requirement r : requirements) {
+            if (r instanceof KlassRequirement) {
+                output.writeUTF(((KlassRequirement) r).klass.toString());
+            }
+        }
+    }
+    public static Student read(DataInputStream input) throws IOException {
+        String name = input.readUTF();
+        Grade grade = Grade.swamplord420noscope(input.readInt());
+        Gender gender = Gender.get(input.readBoolean());
+        int numKlass = input.readInt();
+        ArrayList<Klass> klush = new ArrayList<>();
+        for (int i = 0; i < numKlass; i++) {
+            klush.add(Scheduling.getKlass(input.readUTF()));
+        }
+        return new Student(name, grade, klush, gender);
+    }
     static{
         allRequiredSubjects = new HashMap<>();
         for (Grade grade : Grade.values()) {

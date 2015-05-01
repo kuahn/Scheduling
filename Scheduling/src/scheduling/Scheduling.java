@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 package scheduling;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 import scheduling.api.NanoHTTPD;
 import scheduling.gooey.Gooey;
@@ -65,6 +66,7 @@ public class Scheduling {
     public static int numStud = 0;
     public static ArrayList<Student> students;
     public static ArrayList<Subject> subjects;
+    public static ArrayList<Teacher> teachers;
     public static boolean running = false;
     public static void main2(String[] args) throws IOException {
         students = new ArrayList<>();
@@ -81,8 +83,32 @@ public class Scheduling {
         students.add(new Student("Leif Jurvetson", Grade.GRADE9, Gender.MAIL));
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
+        teachers = rd.teachers;
         Gooey.setup();
         //System.exit(0);
+    }
+    public static void save() throws IOException {
+        String base = System.getProperty("user.home") + "/Documents/saveFile";
+        File dank = new File(base);
+        DataOutputStream shrek = new DataOutputStream(new FileOutputStream(dank));
+        shrek.writeInt(teachers.size());
+        for (Teacher t : teachers) {
+            t.write(shrek);
+        }
+    }
+    public static Teacher getTeacher(String nuevaUsername) {
+        Optional<Teacher> result = teachers.parallelStream().filter(teacher->teacher.nuevaUsername.equals(nuevaUsername)).findAny();
+        if (result.isPresent()) {
+            return result.get();
+        }
+        return null;
+    }
+    public static Klass getKlass(String klassName) {
+        Optional<Klass> result = subjects.parallelStream().flatMap(subject->subject.klasses.parallelStream()).filter(klass->klass.toString().equals(klassName)).findAny();
+        if (result.isPresent()) {
+            return result.get();
+        }
+        return null;
     }
     public static void main(String[] args) throws IOException {
         NanoHTTPD.init();

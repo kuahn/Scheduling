@@ -1,4 +1,6 @@
 package scheduling;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,8 @@ public class Teacher {
     private final ArrayList<Block> workBlocks;
     final ArrayList<Subject> subjectsTeached;
     final ArrayList<Klass> klassesTeached;
+    public void write(DataOutputStream output) throws IOException {
+    }
     public Teacher(String name) {
         this.name = name;
         int l = name.indexOf(' ');
