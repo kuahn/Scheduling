@@ -19,7 +19,7 @@ public class Scheduling {
     /**
      * @param args the command line arguments
      */
-    public static void main2(String[] args) throws Exception {
+    public static void main25434(String[] args) throws Exception {
         Teacher shrek = new Teacher("Shrek");
         shrek.setDoesWork(0, false);
         shrek.setDoesWork(1, false);
@@ -70,7 +70,7 @@ public class Scheduling {
     public static ArrayList<Student> students;
     public static ArrayList<Subject> subjects;
     public static boolean running = false;
-    public static void dank(String[] args) throws IOException, InterruptedException {
+    public static void main2(String[] args) throws IOException, InterruptedException {
         students = new ArrayList<>();
         subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech " + (ti++)), new Teacher("Teech " + (ti++)), new Teacher("Teech " + (ti++))};
@@ -83,7 +83,9 @@ public class Scheduling {
         createSubjects(Grade.GRADE11, subjects, students);
         createSubjects(Grade.GRADE12, subjects, students);
         numStud = students.size();
+        tempTeacherList = new ArrayList<>();
         rd = new RandomScheduler(students, subjects);
+        tempTeacherList.addAll(Schedule.getTeacherList(rd.sections));
         save();
         Gooey.setup();
         //System.exit(0);
