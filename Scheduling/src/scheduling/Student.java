@@ -72,7 +72,6 @@ public class Student {
         String cut = lastName.split(" ")[0];//elllie van der rijn goes to elivan not elivand
         nuevaUsername = (firstName.length() < 3 ? firstName : firstName.substring(0, 3)) + (cut.length() < 4 ? cut : cut.substring(0, 4)).toLowerCase();
         this.grade = grade;
-        requirements = allRequiredSubjects.get(grade);//don't duplicate, because we want changes to requirements for the whole grade propogate to all the students
         customRequirements = requiredClasses.parallelStream().map(klass->new KlassRequirement(klass)).collect(Collectors.toCollection(()->new ArrayList<>()));
         rebuildRequirements();
         this.gender = gender;
@@ -172,9 +171,14 @@ public class Student {
         r.append("\"");
     }
     public final void rebuildRequirements() {
+        requirements = new ArrayList<>(allRequiredSubjects.get(grade));
         for (KlassRequirement klassRequirement : customRequirements) {//if the student is required to take Algebra II, remove the redundant requirement to take one math class
             requirements.remove(new SubjectRequirement(klassRequirement.klass.getSubject(), null));//this works because SubjectRequirement.equals only checks if their subjects are equal
             requirements.add(klassRequirement);
         }
+    }
+    public void addRequirement(KlassRequirement kr) {
+        customRequirements.add(kr);
+        rebuildRequirements();
     }
 }

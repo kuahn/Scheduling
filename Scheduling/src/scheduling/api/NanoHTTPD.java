@@ -96,11 +96,15 @@ public class NanoHTTPD {
         try {
             return call(uri, header);
         } catch (Exception exc) {
-            if (Scheduling.getSchedule() == null) {
-                return new Response(HTTP_INTERNALERROR, Scheduling.status());
-            }
-            exc.printStackTrace();
-            return new Response(HTTP_INTERNALERROR, exc.toString() + exc.getMessage());
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            exc.printStackTrace(pw);
+            return new Response(HTTP_INTERNALERROR, sw.toString()); // stack trace as a string
+            /*if (Scheduling.getSchedule() == null) {
+             return new Response(HTTP_INTERNALERROR, Scheduling.status());
+             }
+             exc.printStackTrace();
+             return new Response(HTTP_INTERNALERROR, exc.toString() + exc.getMessage());*/
         }
         /*
          return serveFile(uri, header, myRootDir, true);*/
@@ -127,7 +131,26 @@ public class NanoHTTPD {
         if (uri.startsWith("status")) {
             return new Response(HTTP_OK, Scheduling.status());
         }
+        if (uri.startsWith("edit/")) {
+            return edit(uri.substring(5, uri.length()), header);
+        }
         return new Response(HTTP_FORBIDDEN, "lol your options are getinfo, conflicts, or list");
+    }
+    public Response edit(String uri, Properties header) {
+        if (uri.startsWith("addteacher/")) {
+            String name = uri.substring(11, uri.length());
+            Scheduling.onAddTeacher(name);
+            return new Response(HTTP_OK, "did it");
+        }
+        if (uri.startsWith("addtosubject/")) {
+            String full = uri.substring(13, uri.length());
+            String[] k = full.split("/");
+            String teachername = k[0];
+            String subjectname = k[1];
+            Scheduling.setTeacherCanTeachSubject(subjectname, teachername, true);
+            return new Response(HTTP_OK, "did it");
+        }
+        return new Response(HTTP_FORBIDDEN, "not dank enough");
     }
     public Response list(String uri, Properties header) {
         if (uri.equals("students")) {
@@ -137,7 +160,7 @@ public class NanoHTTPD {
             return new Response(HTTP_OK, "{rooms:" + Room.getRooms().parallelStream().map(room->room.toString()).map(room->room.substring(5, room.length())).collect(Collectors.toList()) + "}");
         }
         if (uri.equals("teachers")) {
-            return new Response(HTTP_OK, "{teachers:" + Scheduling.rd.teachers.parallelStream().map(teacher->"\"" + teacher.nuevaUsername + "\"").collect(Collectors.toList()) + "}");
+            return new Response(HTTP_OK, "{teachers:" + Scheduling.tempTeacherList.parallelStream().map(teacher->"\"" + teacher.nuevaUsername + "\"").collect(Collectors.toList()) + "}");
         }
         if (uri.equals("sections")) {
             return new Response(HTTP_OK, "{sections:" + Scheduling.rd.sections.parallelStream().map(student->"\"" + student + "\"").collect(Collectors.toList()) + "}");

@@ -80,8 +80,8 @@ public class Klass {
             }
         }
         output.writeInt(teacherUsernames.size());
-        for (String kuSh : teacherUsernames) {
-            output.writeUTF(kuSh);
+        for (String teacherUsername : teacherUsernames) {
+            output.writeUTF(teacherUsername);
         }
         output.writeInt(acceptableRooms.size());
         for (Room r : acceptableRooms) {

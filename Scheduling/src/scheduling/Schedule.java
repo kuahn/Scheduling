@@ -17,7 +17,7 @@ public class Schedule {
     public final ArrayList<Section> sections;
     public final ArrayList<Student> students;
     public final Roster roster;
-    public final ArrayList<Teacher> teacherList;
+    public ArrayList<Teacher> teacherList;
     public Schedule(ArrayList<Section> sections, ArrayList<Student> students) {
         locations = new HashMap<>();
         timings = new HashMap<>();
@@ -25,7 +25,8 @@ public class Schedule {
         this.sections = sections;
         this.students = students;
         this.roster = new Roster(students, sections);
-        teacherList = sections.stream().flatMap(section->section.klass.teachers.stream()).distinct().collect(Collectors.toCollection(()->new ArrayList<>()));
+        //rebuildTeacherList();
+        this.teacherList = Scheduling.tempTeacherList;
     }
     public boolean verifyRoomsTeachers() {
         for (Block block : Block.blocks) {
@@ -202,5 +203,11 @@ public class Schedule {
                 }
             }
         }
+    }
+    public final void rebuildTeacherList() {
+        teacherList = getTeacherList(sections);
+    }
+    public static ArrayList<Teacher> getTeacherList(ArrayList<Section> sections) {
+        return sections.stream().flatMap(section->section.klass.teachers.stream()).distinct().collect(Collectors.toCollection(()->new ArrayList<>()));
     }
 }

@@ -1,13 +1,12 @@
 package scheduling;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 /**
  *
  * @author leijurv
  */
 public abstract class Scheduler {
-    public final ArrayList<Teacher> teachers;
+    public ArrayList<Teacher> teachers;
     public final ArrayList<Subject> subjects;
     public final ArrayList<Klass> klasses;
     public final ArrayList<Section> sections;
@@ -24,7 +23,8 @@ public abstract class Scheduler {
         klasses.stream().forEach(klass->{
             sections.addAll(Arrays.asList(klass.sections));
         });
-        this.teachers = klasses.stream().flatMap(klass->klass.teachers.stream()).distinct().collect(Collectors.toCollection(()->new ArrayList<>()));
+        this.teachers = Scheduling.tempTeacherList;
+        //this.teachers = klasses.stream().flatMap(klass->klass.teachers.stream()).distinct().collect(Collectors.toCollection(()->new ArrayList<>()));
     }
     public abstract void startScheduling();
     public boolean isFinished() {
@@ -32,5 +32,8 @@ public abstract class Scheduler {
     }
     public Schedule getResult() {
         return result;
+    }
+    public void rebuildTeacherList() {
+        teachers = Schedule.getTeacherList(sections);
     }
 }

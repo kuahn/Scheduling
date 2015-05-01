@@ -19,13 +19,12 @@ public class Scheduling {
     /**
      * @param args the command line arguments
      */
-    public static void main1(String[] args) {
+    public static void main2(String[] args) throws Exception {
         Teacher shrek = new Teacher("Shrek");
         shrek.setDoesWork(0, false);
         shrek.setDoesWork(1, false);
         shrek.setDoesWork(2, false);
         shrek.setDoesWork(3, false);
-        shrek.setDoesWork(4, false);
         Teacher donkey = new Teacher("Donkey");
         donkey.setDoesWork(0, false);
         donkey.setDoesWork(2, false);
@@ -34,11 +33,15 @@ public class Scheduling {
         Student.addRequiredSubject(Grade.GRADE9, math);
         Student.addRequiredSubject(Grade.GRADE9, history);
         Student dragon = new Student("Dragon", Grade.GRADE9, new Klass[] {math.klasses.get(0)}, Gender.MAIL);
-        ArrayList<Student> students = new ArrayList<>(Arrays.asList(new Student[] {dragon}));
+        students = new ArrayList<>(Arrays.asList(new Student[] {dragon}));
         System.out.println(dragon.getRequirements());
-        ArrayList<Subject> subjects = new ArrayList<>(Arrays.asList(new Subject[] {math, history}));
-        RandomScheduler rd = new RandomScheduler(students, subjects);
-        rd.startScheduling();
+        subjects = new ArrayList<>(Arrays.asList(new Subject[] {math, history}));
+        tempTeacherList = new ArrayList<>();
+        rd = new RandomScheduler(students, subjects);
+        tempTeacherList.addAll(Schedule.getTeacherList(rd.sections));
+        save();
+        //read();
+        Gooey.setup();
     }
     static Subject language;
     static int ti = 0;
@@ -66,9 +69,8 @@ public class Scheduling {
     public static int numStud = 0;
     public static ArrayList<Student> students;
     public static ArrayList<Subject> subjects;
-    public static ArrayList<Teacher> teachers;
     public static boolean running = false;
-    public static void main2(String[] args) throws IOException, InterruptedException {
+    public static void dank(String[] args) throws IOException, InterruptedException {
         students = new ArrayList<>();
         subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech " + (ti++)), new Teacher("Teech " + (ti++)), new Teacher("Teech " + (ti++))};
@@ -82,17 +84,12 @@ public class Scheduling {
         createSubjects(Grade.GRADE12, subjects, students);
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
-        teachers = rd.teachers;
         save();
         Gooey.setup();
-        Thread.sleep(10000);
-        onAddStudent(new Student("Leif Jurvetson", Grade.GRADE9, Gender.MAIL));
         //System.exit(0);
     }
     public static void main3(String[] args) throws IOException {
         read();
-        numStud = students.size();
-        rd = new RandomScheduler(students, subjects);
         //save();
         Gooey.setup();
     }
@@ -100,8 +97,8 @@ public class Scheduling {
         String base = System.getProperty("user.home") + "/Documents/saveFile";
         File dank = new File(base);
         DataOutputStream shrek = new DataOutputStream(new FileOutputStream(dank));
-        shrek.writeInt(teachers.size());
-        for (Teacher t : teachers) {
+        shrek.writeInt(tempTeacherList.size());
+        for (Teacher t : tempTeacherList) {
             t.write(shrek);
         }
         shrek.writeInt(subjects.size());
@@ -120,14 +117,15 @@ public class Scheduling {
             s.write(shrek);
         }
     }
+    public static ArrayList<Teacher> tempTeacherList;//used for reading beacuse reasons
     public static void read() throws IOException {
         String base = System.getProperty("user.home") + "/Documents/saveFile";
         File dank = new File(base);
         DataInputStream shrek = new DataInputStream(new FileInputStream(dank));
         int numTeachers = shrek.readInt();
-        teachers = new ArrayList<>(numTeachers);
+        tempTeacherList = new ArrayList<>(numTeachers);
         for (int i = 0; i < numTeachers; i++) {
-            teachers.add(Teacher.read(shrek));
+            tempTeacherList.add(Teacher.read(shrek));
         }
         int numSubjects = shrek.readInt();
         subjects = new ArrayList<>(numSubjects);
@@ -150,6 +148,8 @@ public class Scheduling {
         for (int i = 0; i < numStudents; i++) {
             students.add(Student.read(shrek));
         }
+        numStud = students.size();
+        rd = new RandomScheduler(students, subjects);
     }
     public static <Swamp> Swamp get(Optional<Swamp> result) {
         if (result.isPresent()) {
@@ -160,15 +160,43 @@ public class Scheduling {
     public static Subject getSubject(String subjectName) {
         return subjects.parallelStream().filter(subject->subject.name.equals(subjectName)).findAny().get();
     }
-    public static Teacher getTeacher(String nuevaUsername) {
-        return teachers.parallelStream().filter(teacher->teacher.name.equals(nuevaUsername)).findAny().get();
+    public static Teacher getTeacher(String fullName) {
+        return tempTeacherList.parallelStream().filter(teacher->teacher.name.equals(fullName)).findAny().get();
     }
     public static Klass getKlass(String klassName) {
         return subjects.parallelStream().flatMap(subject->subject.klasses.parallelStream()).filter(klass->klass.toString().equals(klassName)).findAny().get();
     }
+    public static void onAddTeacher(String teacherName) {
+        tempTeacherList.add(new Teacher(teacherName));
+    }
     public static void onAddStudent(Student student) {
         students.add(student);
         rd.onAddStudent(student);
+    }
+    public static void newStudentRequirement(Student student, Klass klass) {
+        student.addRequirement(new KlassRequirement(klass));
+    }
+    public static void setTeacherCanTeachKlass(String klassName, String teacherName, boolean canTeach) {
+        Klass klass = getKlass(klassName);
+        Teacher teacher = getTeacher(teacherName);
+        if (canTeach) {
+            klass.teachers.add(teacher);
+            teacher.klassesTeached.add(klass);
+        } else {
+            klass.teachers.remove(teacher);
+            teacher.klassesTeached.remove(klass);
+        }
+    }
+    public static void setTeacherCanTeachSubject(String subjectName, String teacherName, boolean canTeach) {
+        Teacher teacher = getTeacher(teacherName);
+        Subject subject = getSubject(subjectName);
+        if (canTeach) {
+            subject.teachers.add(teacher);
+            teacher.subjectsTeached.add(subject);
+        } else {
+            subject.teachers.remove(teacher);
+            teacher.subjectsTeached.add(subject);
+        }
     }
     public static void main(String[] args) throws Exception {
         NanoHTTPD.init();
