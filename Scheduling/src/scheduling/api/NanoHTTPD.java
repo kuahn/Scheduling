@@ -154,13 +154,13 @@ public class NanoHTTPD {
     }
     public Response list(String uri, Properties header) {
         if (uri.equals("students")) {
-            return new Response(HTTP_OK, "{students:" + Scheduling.students.parallelStream().map(student->"\"" + student.nuevaUsername + "\"").collect(Collectors.toList()) + "}");
+            return new Response(HTTP_OK, "{students:" + Scheduling.students.parallelStream().map(student->"\"" + student.name + "\"").collect(Collectors.toList()) + "}");
         }
         if (uri.equals("rooms")) {
             return new Response(HTTP_OK, "{rooms:" + Room.getRooms().parallelStream().map(room->room.toString()).map(room->room.substring(5, room.length())).collect(Collectors.toList()) + "}");
         }
         if (uri.equals("teachers")) {
-            return new Response(HTTP_OK, "{teachers:" + Scheduling.tempTeacherList.parallelStream().map(teacher->"\"" + teacher.nuevaUsername + "\"").collect(Collectors.toList()) + "}");
+            return new Response(HTTP_OK, "{teachers:" + Scheduling.tempTeacherList.parallelStream().map(teacher->"\"" + teacher.name + "\"").collect(Collectors.toList()) + "}");
         }
         if (uri.equals("sections")) {
             return new Response(HTTP_OK, "{sections:" + Scheduling.rd.sections.parallelStream().map(student->"\"" + student + "\"").collect(Collectors.toList()) + "}");
@@ -181,7 +181,7 @@ public class NanoHTTPD {
     }
     public Response getTeacherSchedule(String uri, Properties header) {
         ArrayList<Teacher> teachers = Scheduling.rd.teachers;
-        Optional<Teacher> s = teachers.parallelStream().filter(teacher->teacher.nuevaUsername.equalsIgnoreCase(uri)).findAny();
+        Optional<Teacher> s = teachers.parallelStream().filter(teacher->teacher.name.equalsIgnoreCase(uri)).findAny();
         if (s.isPresent()) {
             return new Response(HTTP_OK, s.get().getinfo(Scheduling.getSchedule()));
         }
@@ -189,7 +189,7 @@ public class NanoHTTPD {
     }
     public Response getStudentSchedule(String uri, Properties header) {
         ArrayList<Student> students = Scheduling.getSchedule().students;
-        Optional<Student> s = students.parallelStream().filter(student->student.nuevaUsername.equalsIgnoreCase(uri)).findAny();
+        Optional<Student> s = students.parallelStream().filter(student->student.name.equalsIgnoreCase(uri)).findAny();
         if (s.isPresent()) {
             return new Response(HTTP_OK, s.get().getinfo(Scheduling.getSchedule()));
         }
