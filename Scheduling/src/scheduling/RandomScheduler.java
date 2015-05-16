@@ -163,10 +163,7 @@ public class RandomScheduler extends Scheduler {
             System.exit(0);
         }
         ArrayList<Room> acceptableRooms = new ArrayList<>(section.klass.acceptableRooms);
-        // for (int i = 0; i < acceptableRooms.size(); i++) {//randomize
-        //    acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
-        // }
-        boolean df = false;
+        // TODO see if this needs to be randomized
         while (!posss.isEmpty()) {
             Teacher t = posss.remove(rand.nextInt(posss.size()));
             ArrayList<Block> workingBlocks = new ArrayList<>(t.getWorkingBlocks());//some teachers only work some times, remember? grr
@@ -175,12 +172,11 @@ public class RandomScheduler extends Scheduler {
                 System.exit(0);
                 //if this continues, netbeans complains because b might not be initialized in temp.getTeacherLocation in the while condition on line 144
             }
-            boolean f = false;
             while (!workingBlocks.isEmpty()) {
                 //acceptableRooms.add(acceptableRooms.remove(rand.nextInt(acceptableRooms.size())));
                 Block b = workingBlocks.remove(rand.nextInt(workingBlocks.size()));
                 if (temp.isTeacherUnoccupied(t, b)) {
-                    Optional<Room> r = acceptableRooms.parallelStream().filter(room->temp.isRoomEmpty(room, b)).findAny();
+                    Optional<Room> r = acceptableRooms.parallelStream().filter(room->temp.isRoomEmpty(room, b)).findAny();// TODO see if this randomizes it
                     if (r.isPresent()) {
                         temp.teachers.put(section, t);
                         temp.timings.put(section, b);
