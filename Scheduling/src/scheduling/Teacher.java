@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
  * @author leijurv
  */
 public class Teacher {
-    final String name;
+    public final String name;
     final String firstName;
     final String lastName;
-    public final String nuevaUsername;
+    private final String nuevaUsername;
     private final boolean[] workingBlocks = new boolean[Block.numBlocks];
     private final ArrayList<Block> workBlocks;
     final ArrayList<Subject> subjectsTeached;

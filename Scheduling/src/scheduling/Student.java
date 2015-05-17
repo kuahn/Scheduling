@@ -16,7 +16,7 @@ public class Student {
     public final String name;
     public final String firstName;
     public final String lastName;//if the name is ellie van der rine, the lastname would be "van der rine" and the firstname would be "ellie"
-    public final String nuevaUsername;
+    private final String nuevaUsername;
     public final Grade grade;
     public final Gender gender;
     public void write(DataOutputStream output) throws IOException {

@@ -5,10 +5,7 @@
  */
 package scheduling;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import scheduling.api.NanoHTTPD;
 import scheduling.gooey.Gooey;
 /**
@@ -57,10 +54,11 @@ public class Scheduling {
             Student.addRequiredSubject(grade, dank);
             subjects.add(dank);
         }
-        for (int i = 0; i < 100; i++) {
-            Student dragon = new Student(grade + "student s" + i, grade, Gender.get(r.nextBoolean()));
-            students.add(dragon);
-        }
+        /*
+         for (int i = 0; i < 100; i++) {
+         Student dragon = new Student(grade + "student s" + i, grade, Gender.get(r.nextBoolean()));
+         students.add(dragon);
+         }*/
     }
     public static double numAt = 0;
     public static double numU = 0;
@@ -70,7 +68,7 @@ public class Scheduling {
     public static ArrayList<Student> students;
     public static ArrayList<Subject> subjects;
     public static boolean running = false;
-    public static void main2(String[] args) throws IOException, InterruptedException {
+    public static void main3(String[] args) throws IOException, InterruptedException {
         students = new ArrayList<>();
         subjects = new ArrayList<>();
         Teacher[] langTeach = new Teacher[] {new Teacher("Teech " + (ti++)), new Teacher("Teech " + (ti++)), new Teacher("Teech " + (ti++))};
@@ -80,8 +78,7 @@ public class Scheduling {
         Student.addRequiredSubject(Grade.GRADE10, language);
         createSubjects(Grade.GRADE9, subjects, students);
         createSubjects(Grade.GRADE10, subjects, students);
-        createSubjects(Grade.GRADE11, subjects, students);
-        createSubjects(Grade.GRADE12, subjects, students);
+        importfromFile();
         numStud = students.size();
         tempTeacherList = new ArrayList<>();
         rd = new RandomScheduler(students, subjects);
@@ -90,13 +87,29 @@ public class Scheduling {
         Gooey.setup();
         //System.exit(0);
     }
-    public static void main3(String[] args) throws IOException {
+    public static void importfromFile() throws IOException {
+        try(BufferedReader br = new BufferedReader(new FileReader(new File("/Users/leijurv/Desktop/dank swamp kush.txt")))) {
+            String line;
+            Random rand = new Random();
+            while ((line = br.readLine()) != null) {
+                String lastName = line.split(",")[0];
+                String firstName = line.split(", ")[1].split(" \\(")[0];
+                String grade = line.split("\\(")[1].split("\\)")[0];
+                int gr = Integer.parseInt(grade);
+                Grade gra = Grade.swamplord420noscope(gr);
+                ArrayList<Klass> requiredKlasses = new ArrayList<>();
+                Student student = new Student(firstName + " " + lastName, gra, requiredKlasses, Gender.get(rand.nextBoolean()));
+                students.add(student);
+            }
+        }
+    }
+    public static void main2(String[] args) throws IOException {
         read();
         //save();
         Gooey.setup();
     }
     public static void save() throws IOException {
-        String base = System.getProperty("user.home") + "/Documents/saveFile";
+        String base = System.getProperty("user.home") + "/Documents/saveFiles/saveFile" + System.currentTimeMillis();
         File dank = new File(base);
         DataOutputStream shrek = new DataOutputStream(new FileOutputStream(dank));
         shrek.writeInt(tempTeacherList.size());
@@ -121,9 +134,16 @@ public class Scheduling {
     }
     public static ArrayList<Teacher> tempTeacherList;//used for reading beacuse reasons
     public static void read() throws IOException {
-        String base = System.getProperty("user.home") + "/Documents/saveFile";
-        File dank = new File(base);
-        DataInputStream shrek = new DataInputStream(new FileInputStream(dank));
+        String base = System.getProperty("user.home") + "/Documents/saveFiles/";
+        List<File> dankk = Arrays.asList(new File(base).listFiles());
+        dankk.sort(new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                return o2.getName().compareTo(o1.getName());
+            }
+        });
+        System.out.println(dankk.get(0));
+        DataInputStream shrek = new DataInputStream(new FileInputStream(dankk.get(0)));
         int numTeachers = shrek.readInt();
         tempTeacherList = new ArrayList<>(numTeachers);
         for (int i = 0; i < numTeachers; i++) {
@@ -150,6 +170,7 @@ public class Scheduling {
         for (int i = 0; i < numStudents; i++) {
             students.add(Student.read(shrek));
         }
+        shrek.close();
         numStud = students.size();
         rd = new RandomScheduler(students, subjects);
     }
